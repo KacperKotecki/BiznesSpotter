@@ -1,0 +1,22 @@
+# --- .dockerignore ---
+
+# Ignorujemy Gita i GitHubowe ustawienia wewnątrz kontenera
+.git
+.github
+.gitignore
+
+# Ignorujemy binaria (Docker sam sobie zbuduje świeże)
+**/bin/
+**/obj/
+
+# Ignorujemy bazę danych (nie chcemy pustej bazy nadpisać tej na serwerze)
+*.db
+*.sqlite
+
+# IDE
+.vscode
+.idea
+.DS_Store
+
+# Sam Dockerfile nie jest potrzebny w środku obrazu
+Dockerfile
