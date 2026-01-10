@@ -1,8 +1,346 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Strona Główna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* Style lokalne dla sekcji Hero */
+    .hero-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        padding: 5rem 1rem 6rem 1rem; /* Dodatkowy padding na dole na formularz */
+        border-radius: 0.5rem;
+        margin-bottom: -3rem; /* Efekt "overlap" dla karty wyszukiwania */
+        text-align: center;
+    }
+
+    .search-container {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+    }
+
+    .category-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+        border: 1px solid #e9ecef;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .category-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #0d6efd;
+    }
+</style>
+
+<!-- 1. Sekcja Hero -->
+<div class="hero-section shadow-sm">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
+        <p class="lead mb-4">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
+    </div>
 </div>
+
+<!-- 2. Główny Formularz (Search Box) -->
+<div class="container search-container mb-5">
+    <div class="card shadow border-0">
+        <div class="card-body p-4">
+            <form asp-controller="Home" asp-action="Search" method="get">
+                <div class="row g-3">
+                    
+                    <!-- Lokalizacja -->
+                    <div class="col-lg-4 col-md-6">
+                        <label for="locationInput" class="form-label fw-bold">Lokalizacja</label>
+                        <input type="text" class="form-control form-control-lg" id="locationInput" name="location" placeholder="Np. Warszawa, Mokotów">
+                        <div class="form-text">Wpisz miasto lub dzielnicę.</div>
+                    </div>
+
+                    <!-- Branża -->
+                    <div class="col-lg-4 col-md-6">
+                        <label for="industrySelect" class="form-label fw-bold">Branża</label>
+                        <select class="form-select form-select-lg" id="industrySelect" name="industry">
+                            <option selected disabled>Wybierz kategorię...</option>
+                            <optgroup label="Usługi">
+                                <option value="fryzjer">Fryzjer / Barber</option>
+                                <option value="kosmetyczka">Salon kosmetyczny</option>
+                                <option value="mechanik">Warsztat samochodowy</option>
+                            </optgroup>
+                            <optgroup label="Gastronomia">
+                                <option value="kebab">Kebab / Fast Food</option>
+                                <option value="kawiarnia">Kawiarnia</option>
+                                <option value="restauracja">Restauracja</option>
+                            </optgroup>
+                            <optgroup label="Handel">
+                                <option value="spożywczy">Sklep spożywczy</option>
+                                <option value="odzież">Butik odzieżowy</option>
+                                <option value="zabka">Franczyza (typu Żabka)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Promień analizy (Slider) -->
+                    <div class="col-lg-4 col-md-12">
+                        <label for="radiusRange" class="form-label fw-bold d-flex justify-content-between">
+                            Promień analizy
+                            <span id="radiusValue" class="badge bg-primary">1.0 km</span>
+                        </label>
+                        <input type="range" class="form-range" min="0.5" max="5.0" step="0.5" id="radiusRange" name="radius" value="1.0" oninput="updateRadius(this.value)">
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>0.5 km</span>
+                            <span>5 km</span>
+                        </div>
+                    </div>
+
+                    <!-- Przycisk -->
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3">
+                            <i class="bi bi-search me-2"></i> Analizuj potencjał
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Sekcja "Szybki Wybór" -->
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-secondary">Szybki wybór popularnych branż</h3>
+    </div>
+    
+    <div class="row g-4 justify-content-center">
+        <!-- Fryzjer -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">✂️</div> <!-- Można zamienić na <i class="bi bi-scissors"></i> jeśli masz Bootstrap Icons -->
+                    <h5 class="card-title">Fryzjer</h5>
+                    <p class="card-text small text-muted">Wysoki popyt lokalny.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastronomia -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">🍔</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Gastronomia</h5>
+                    <p class="card-text small text-muted">Restauracje i fast-food.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sklep -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">🛒</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Sklep spożywczy</h5>
+                    <p class="card-text small text-muted">Codzienne zakupy.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        
+         <!-- Biuro -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">💼</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Biuro / Usługi</h5>
+                    <p class="card-text small text-muted">Księgowość, IT, Prawo.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prosty skrypt JS do obsługi suwaka -->
+<script>
+    function updateRadius(val) {
+        document.getElementById('// filepath: /Users/kacper/Documents/BiznesSpotter/BiznesSpoter.Web/Views/Home/Index.cshtml
+@{
+    ViewData["Title"] = "Strona Główna";
+}
+
+<style>
+    /* Style lokalne dla sekcji Hero */
+    .hero-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        padding: 5rem 1rem 6rem 1rem; /* Dodatkowy padding na dole na formularz */
+        border-radius: 0.5rem;
+        margin-bottom: -3rem; /* Efekt "overlap" dla karty wyszukiwania */
+        text-align: center;
+    }
+
+    .search-container {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+    }
+
+    .category-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+        border: 1px solid #e9ecef;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .category-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #0d6efd;
+    }
+</style>
+
+<!-- 1. Sekcja Hero -->
+<div class="hero-section shadow-sm">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
+        <p class="lead mb-4">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
+    </div>
+</div>
+
+<!-- 2. Główny Formularz (Search Box) -->
+<div class="container search-container mb-5">
+    <div class="card shadow border-0">
+        <div class="card-body p-4">
+            <form asp-controller="Home" asp-action="Search" method="get">
+                <div class="row g-3">
+                    
+                    <!-- Lokalizacja -->
+                    <div class="col-lg-4 col-md-6">
+                        <label for="locationInput" class="form-label fw-bold">Lokalizacja</label>
+                        <input type="text" class="form-control form-control-lg" id="locationInput" name="location" placeholder="Np. Warszawa, Mokotów">
+                        <div class="form-text">Wpisz miasto lub dzielnicę.</div>
+                    </div>
+
+                    <!-- Branża -->
+                    <div class="col-lg-4 col-md-6">
+                        <label for="industrySelect" class="form-label fw-bold">Branża</label>
+                        <select class="form-select form-select-lg" id="industrySelect" name="industry">
+                            <option selected disabled>Wybierz kategorię...</option>
+                            <optgroup label="Usługi">
+                                <option value="fryzjer">Fryzjer / Barber</option>
+                                <option value="kosmetyczka">Salon kosmetyczny</option>
+                                <option value="mechanik">Warsztat samochodowy</option>
+                            </optgroup>
+                            <optgroup label="Gastronomia">
+                                <option value="kebab">Kebab / Fast Food</option>
+                                <option value="kawiarnia">Kawiarnia</option>
+                                <option value="restauracja">Restauracja</option>
+                            </optgroup>
+                            <optgroup label="Handel">
+                                <option value="spożywczy">Sklep spożywczy</option>
+                                <option value="odzież">Butik odzieżowy</option>
+                                <option value="zabka">Franczyza (typu Żabka)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Promień analizy (Slider) -->
+                    <div class="col-lg-4 col-md-12">
+                        <label for="radiusRange" class="form-label fw-bold d-flex justify-content-between">
+                            Promień analizy
+                            <span id="radiusValue" class="badge bg-primary">1.0 km</span>
+                        </label>
+                        <input type="range" class="form-range" min="0.5" max="5.0" step="0.5" id="radiusRange" name="radius" value="1.0" oninput="updateRadius(this.value)">
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>0.5 km</span>
+                            <span>5 km</span>
+                        </div>
+                    </div>
+
+                    <!-- Przycisk -->
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3">
+                            <i class="bi bi-search me-2"></i> Analizuj potencjał
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Sekcja "Szybki Wybór" -->
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-secondary">Szybki wybór popularnych branż</h3>
+    </div>
+    
+    <div class="row g-4 justify-content-center">
+        <!-- Fryzjer -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">✂️</div> <!-- Można zamienić na <i class="bi bi-scissors"></i> jeśli masz Bootstrap Icons -->
+                    <h5 class="card-title">Fryzjer</h5>
+                    <p class="card-text small text-muted">Wysoki popyt lokalny.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastronomia -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">🍔</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Gastronomia</h5>
+                    <p class="card-text small text-muted">Restauracje i fast-food.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sklep -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">🛒</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Sklep spożywczy</h5>
+                    <p class="card-text small text-muted">Codzienne zakupy.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        
+         <!-- Biuro -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 text-center p-3 category-card shadow-sm">
+                <div class="card-body">
+                    <div class="category-icon">💼</div> <!-- Można zamienić na ikonę -->
+                    <h5 class="card-title">Biuro / Usługi</h5>
+                    <p class="card-text small text-muted">Księgowość, IT, Prawo.</p>
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prosty skrypt JS do obsługi suwaka -->
+<script>
+    function updateRadius(val) {
+        document.getElementById('radiusValue').innerText = val + " km";
+}
+</script>
