@@ -7,9 +7,11 @@
     .hero-section {
         background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
         color: white;
-        padding: 5rem 1rem 6rem 1rem; /* Dodatkowy padding na dole na formularz */
+        padding: 5rem 1rem 6rem 1rem;
+        /* Dodatkowy padding na dole na formularz */
         border-radius: 0.5rem;
-        margin-bottom: -3rem; /* Efekt "overlap" dla karty wyszukiwania */
+        margin-bottom: -3rem;
+        /* Efekt "overlap" dla karty wyszukiwania */
         text-align: center;
     }
 
@@ -53,11 +55,12 @@
         <div class="card-body p-4">
             <form asp-controller="Home" asp-action="Search" method="get">
                 <div class="row g-3">
-                    
+
                     <!-- Lokalizacja -->
                     <div class="col-lg-4 col-md-6">
                         <label for="locationInput" class="form-label fw-bold">Lokalizacja</label>
-                        <input type="text" class="form-control form-control-lg" id="locationInput" name="location" placeholder="Np. Warszawa, Mokotów">
+                        <input type="text" class="form-control form-control-lg" id="locationInput" name="location"
+                            placeholder="Np. Warszawa, Mokotów">
                         <div class="form-text">Wpisz miasto lub dzielnicę.</div>
                     </div>
 
@@ -90,7 +93,8 @@
                             Promień analizy
                             <span id="radiusValue" class="badge bg-primary">1.0 km</span>
                         </label>
-                        <input type="range" class="form-range" min="0.5" max="5.0" step="0.5" id="radiusRange" name="radius" value="1.0" oninput="updateRadius(this.value)">
+                        <input type="range" class="form-range" min="0.5" max="5.0" step="0.5" id="radiusRange"
+                            name="radius" value="1.0" oninput="updateRadius(this.value)">
                         <div class="d-flex justify-content-between text-muted small">
                             <span>0.5 km</span>
                             <span>5 km</span>
@@ -109,18 +113,24 @@
     </div>
 </div>
 
+<!-- Przycisk do widoku mapy -->
+<div class="container text-center my-4">
+    <a asp-controller="Home" asp-action="Mapa" class="btn btn-outline-secondary btn-lg">Zobacz mapę</a>
+</div>
+
 <!-- 3. Sekcja "Szybki Wybór" -->
 <div class="container py-5">
     <div class="text-center mb-4">
         <h3 class="fw-bold text-secondary">Szybki wybór popularnych branż</h3>
     </div>
-    
+
     <div class="row g-4 justify-content-center">
         <!-- Fryzjer -->
         <div class="col-6 col-md-4 col-lg-3">
             <div class="card h-100 text-center p-3 category-card shadow-sm">
                 <div class="card-body">
-                    <div class="category-icon">✂️</div> <!-- Można zamienić na <i class="bi bi-scissors"></i> jeśli masz Bootstrap Icons -->
+                    <div class="category-icon">✂️</div>
+                    <!-- Można zamienić na <i class="bi bi-scissors"></i> jeśli masz Bootstrap Icons -->
                     <h5 class="card-title">Fryzjer</h5>
                     <p class="card-text small text-muted">Wysoki popyt lokalny.</p>
                     <a href="#" class="stretched-link"></a>
@@ -151,8 +161,8 @@
                 </div>
             </div>
         </div>
-        
-         <!-- Biuro -->
+
+        <!-- Biuro -->
         <div class="col-6 col-md-4 col-lg-3">
             <div class="card h-100 text-center p-3 category-card shadow-sm">
                 <div class="card-body">
@@ -169,8 +179,9 @@
             <div class="row justify-content-center text-center">
                 <div class="col-md-8">
                     <h3 class="fw-bold mb-3">Sprawdź potencjał demograficzny (GUS)</h3>
-                    <p class="text-muted mb-4">Wpisz nazwę miasta, aby pobrać oficjalne dane o ludności z Banku Danych Lokalnych.</p>
-                    
+                    <p class="text-muted mb-4">Wpisz nazwę miasta, aby pobrać oficjalne dane o ludności z Banku Danych
+                        Lokalnych.</p>
+
                     <form asp-action="GusStats" method="get" class="d-flex gap-2 justify-content-center">
                         <input type="text" name="city" class="form-control w-50" placeholder="Np. Wrocław" required>
                         <button type="submit" class="btn btn-outline-primary">Pobierz dane GUS</button>
@@ -190,55 +201,55 @@
     function updateRadius(val) {
         document.getElementById('// filepath: /Users/kacper/Documents/BiznesSpotter/BiznesSpoter.Web/Views/Home/Index.cshtml
 @{
-    ViewData["Title"] = "Strona Główna";
-}
+        ViewData["Title"] = "Strona Główna";
+            }
 
-<style>
+            <style>
     /* Style lokalne dla sekcji Hero */
-    .hero-section {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-        color: white;
-        padding: 5rem 1rem 6rem 1rem; /* Dodatkowy padding na dole na formularz */
-        border-radius: 0.5rem;
-        margin-bottom: -3rem; /* Efekt "overlap" dla karty wyszukiwania */
-        text-align: center;
+                .hero-section {
+                    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+                color: white;
+                padding: 5rem 1rem 6rem 1rem; /* Dodatkowy padding na dole na formularz */
+                border-radius: 0.5rem;
+                margin-bottom: -3rem; /* Efekt "overlap" dla karty wyszukiwania */
+                text-align: center;
     }
 
-    .search-container {
-        max-width: 900px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 10;
+                .search-container {
+                    max - width: 900px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 10;
     }
 
-    .category-card {
-        transition: transform 0.2s;
-        cursor: pointer;
-        border: 1px solid #e9ecef;
+                .category-card {
+                    transition: transform 0.2s;
+                cursor: pointer;
+                border: 1px solid #e9ecef;
     }
 
-    .category-card:hover {
-        transform: translateY(-5px);
-        border-color: #0d6efd;
-        background-color: #f8f9fa;
+                .category-card:hover {
+                    transform: translateY(-5px);
+                border-color: #0d6efd;
+                background-color: #f8f9fa;
     }
 
-    .category-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        color: #0d6efd;
+                .category-icon {
+                    font - size: 2rem;
+                margin-bottom: 0.5rem;
+                color: #0d6efd;
     }
-</style>
+            </style>
 
-<!-- 1. Sekcja Hero -->
-<div class="hero-section shadow-sm">
-    <div class="container">
-        <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
-        <p class="lead mb-4">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
-    </div>
-</div>
+            <!-- 1. Sekcja Hero -->
+            < div class= "hero-section shadow-sm" >
+            <div class="container">
+                <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
+                <p class="lead mb-4">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
+            </div>
+</div >
 
-<!-- 2. Główny Formularz (Search Box) -->
+< !--2. Główny Formularz(Search Box)-- >
 <div class="container search-container mb-5">
     <div class="card shadow border-0">
         <div class="card-body p-4">
@@ -300,7 +311,7 @@
     </div>
 </div>
 
-<!-- 3. Sekcja "Szybki Wybór" -->
+<!--3. Sekcja "Szybki Wybór" -- >
 <div class="container py-5">
     <div class="text-center mb-4">
         <h3 class="fw-bold text-secondary">Szybki wybór popularnych branż</h3>
@@ -357,9 +368,9 @@
     </div>
 </div>
 
-<!-- Prosty skrypt JS do obsługi suwaka -->
-<script>
-    function updateRadius(val) {
-        document.getElementById('radiusValue').innerText = val + " km";
+<!--Prosty skrypt JS do obsługi suwaka-- >
+            <script>
+                function updateRadius(val) {
+                    document.getElementById('radiusValue').innerText = val + " km";
 }
 </script>

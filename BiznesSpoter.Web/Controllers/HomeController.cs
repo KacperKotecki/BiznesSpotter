@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BiznesSpoter.Web.Models;
-using BiznesSpoter.Web.Services; 
+using BiznesSpoter.Web.Services;
 
 
 namespace BiznesSpoter.Web.Controllers;
@@ -15,7 +15,7 @@ public class HomeController : Controller
     {
         _logger = logger;
         _placesService = placesService;
-        _gusService = gusService; 
+        _gusService = gusService;
     }
 
     [HttpGet]
@@ -51,6 +51,14 @@ public class HomeController : Controller
 
     public IActionResult Privacy()
     {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Mapa()
+    {
+        // Klucz API Google Maps przekazywany do widoku
+        ViewData["GoogleMapsApiKey"] = "AIzaSyAZv4OqA2d1m5m9oQoUk5D83pRHosgrELA";
         return View();
     }
 
