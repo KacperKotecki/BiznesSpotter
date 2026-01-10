@@ -163,6 +163,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- 4. Sekcja Testowa GUS (Tymczasowa) -->
+        <div class="container py-5 border-top">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-8">
+                    <h3 class="fw-bold mb-3">Sprawdź potencjał demograficzny (GUS)</h3>
+                    <p class="text-muted mb-4">Wpisz nazwę miasta, aby pobrać oficjalne dane o ludności z Banku Danych Lokalnych.</p>
+                    
+                    <form asp-action="GusStats" method="get" class="d-flex gap-2 justify-content-center">
+                        <input type="text" name="city" class="form-control w-50" placeholder="Np. Wrocław" required>
+                        <button type="submit" class="btn btn-outline-primary">Pobierz dane GUS</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
     </div>
 </div>
 

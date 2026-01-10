@@ -10,12 +10,12 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly GooglePlacesService _placesService; // Wstrzykujemy serwis
-
-    // Aktualizujemy konstruktor
-    public HomeController(ILogger<HomeController> logger, GooglePlacesService placesService)
+    private readonly GusService _gusService;
+    public HomeController(ILogger<HomeController> logger, GooglePlacesService placesService, GusService gusService)
     {
         _logger = logger;
         _placesService = placesService;
+        _gusService = gusService; 
     }
 
     [HttpGet]
@@ -35,7 +35,15 @@ public class HomeController : Controller
 
         return View(results);
     }
+    [HttpGet]
+    public async Task<IActionResult> GusStats(string city)
+    {
+        if (string.IsNullOrWhiteSpace(city))
+            return RedirectToAction("Index");
 
+        var stats = await _gusService.GetCityStatsAsync(city);
+        return View(stats);
+    }
     public IActionResult Index()
     {
         return View();
