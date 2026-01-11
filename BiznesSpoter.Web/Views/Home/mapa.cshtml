@@ -2,13 +2,11 @@
 @model BiznesSpoter.Web.Models.SearchMapViewModel
 
 @{
-    ViewData["Title"] = "Mapa Wyników";
+    ViewData["Title"] = "Mapa Wyników i Analiza Nasycenia";
 
-    // Sprawdzamy czy lista Places nie jest nullem i czy ma elementy
     var hasPlaces = Model.Places != null && Model.Places.Any();
     var hasGusData = Model.GusStats != null;
 
-    // Konfiguracja, żeby pola w JS miały małe litery (np. place.name zamiast place.Name)
     var jsonOptions = new JsonSerializerOptions
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -25,7 +23,6 @@
         }
     </div>
 
-    <!-- Pasek informacyjny o parametrach wyszukiwania -->
     <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4" role="alert">
         <div class="me-auto">
             <strong>Kryteria wyszukiwania:</strong>
@@ -40,29 +37,57 @@
         </div>
     </div>
 
-    <!-- DANE DEMOGRAFICZNE (GUS) -->
-    @if (hasGusData)
-    {
-        <div class="card border-primary mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Dane demograficzne:
-                    @Model.GusStats!.CityName</span>
-                <span class="badge bg-white text-primary">Rok: @Model.GusStats.Year</span>
-            </div>
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="card-title mb-0">Liczba mieszkańców</h5>
-                    <small class="text-muted">Źródło: Bank Danych Lokalnych GUS</small>
+    <div class="row g-4 mb-4">
+        <div class="col-md-5">
+            @if (hasGusData)
+            {
+                <div class="card border-primary h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Demografia:
+                            @Model.GusStats!.CityName</span>
+                        <span class="badge bg-white text-primary">@Model.GusStats.Year</span>
+                    </div>
+                    <div class="card-body py-4">
+                        <p class="text-muted small text-uppercase mb-1">Liczba mieszkańców</p>
+                        <h2 class="fw-bold text-primary mb-0">
+                            @((Model.GusStats.Population.HasValue) ? Model.GusStats.Population.Value.ToString("N0") : "—")
+                        </h2>
+                    </div>
                 </div>
-                <h2 class="fw-bold text-primary mb-0">
-                    @((Model.GusStats.Population.HasValue) ? Model.GusStats.Population.Value.ToString("N0") : "—")
-                </h2>
-            </div>
+            }
         </div>
-    }
 
-    <!-- Przycisk powrotu -->
-    <a asp-action="Index" class="btn btn-outline-secondary mb-3">Wróć do wyszukiwania</a>
+        <div class="col-md-7">
+            @if (hasGusData)
+            {
+                <div class="card h-100 shadow-sm border-0"
+                    style="border-left: 8px solid @Model.GusStats!.MarketStatusColor !important;">
+                    <div class="card-body py-3">
+                        <h5 class="fw-bold mb-1">Analiza Powodzenia Biznesu</h5>
+                        <p class="text-muted small mb-3">
+                            Na 1 firmę przypada ok. <strong>@Model.GusStats.ResidentsPerBusiness.ToString("N0")</strong>
+                            mieszkańców.
+                        </p>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="px-3 py-2 rounded text-white fw-bold shadow-sm"
+                                style="background-color: @Model.GusStats.MarketStatusColor">
+                                @Model.GusStats.MarketStatusText
+                            </div>
+                            <div class="small text-muted">
+                                Wskaźnik: <strong>@Model.GusStats.CompetitionIndex.ToString("F2")</strong> <br />
+                                <small>(placówek / 10k mieszk.)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">Wróć do wyszukiwania</a>
+    </div>
 
     @if (!hasPlaces)
     {
@@ -72,14 +97,13 @@
     }
     else
     {
-        <!-- 1. KONTENER MAPY -->
-        <div id="map" style="height:500px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;">
+        <div id="map" style="height:550px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"
+            class="shadow-sm">
         </div>
 
-        <!-- 2. TABELA WYNIKÓW -->
         <h3 class="mb-3">Szczegóły znalezionych miejsc</h3>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover shadow-sm">
+        <div class="table-responsive mb-5">
+            <table class="table table-striped table-hover shadow-sm border">
                 <thead class="table-dark">
                     <tr>
                         <th>Nazwa</th>
@@ -99,7 +123,7 @@
                                 {
                                     <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill"
                                             style="font-size:0.7em;"></i></span>
-                                    <span class="text-muted small">(@place.UserRatingsTotal opinii)</span>
+                                    <span class="text-muted small">(@place.UserRatingsTotal)</span>
                                 }
                                 else
                                 {
@@ -122,10 +146,7 @@
 
 @section Scripts {
     <script>
-
         const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model.Places, jsonOptions) : "[]");
-        
-        // FIX 1: Używamy JsonSerializer do liczb, aby ZAWSZE była kropka (np. 52.22), a nie przecinek (52,22)
         const centerLat = @Html.Raw(JsonSerializer.Serialize(Model.CenterLat));
         const centerLng = @Html.Raw(JsonSerializer.Serialize(Model.CenterLng));
         const searchRadiusKm = @Html.Raw(JsonSerializer.Serialize(Model.SearchRadius));
@@ -133,62 +154,13 @@
         function initMap() {
             const centerPoint = { lat: centerLat, lng: centerLng };
 
-            // Uproszczony styl: ukrywamy etykiety i ikony, upraszczamy drogi; NIE ZMIENIAMY "landscape" (teren) — dodajemy wyraźne style dla budynków
             const simplifiedStyle = [
-                {
-                    "featureType": "poi",
-                    "elementType": "labels",
-                    "stylers": [{ "visibility": "off" }] // Ukrywa domyślne ikony, by nie zasłaniały budynków
-                },
-                {
-                    "featureType": "transit",
-                    "stylers": [{ "visibility": "off" }]
-                },
-                {
-                    "elementType": "labels.icon",
-                    "stylers": [{ "visibility": "off" }]
-                },
-
-                // --- PARKI I ZIELEŃ ---
-                {
-                    "featureType": "poi.park",
-                    "elementType": "geometry",
-                    "stylers": [
-                        { "visibility": "on" },
-                        { "color": "#c5e1a5" } // Przyjemna, naturalna zieleń
-                    ]
-                },
-                // --- WODA I RZEKI ---
-                {
-                    "featureType": "water",
-                    "elementType": "geometry",
-                    "stylers": [
-                        { "visibility": "on" },
-                        { "color": "#b3e5fc" } // Wyraźny, jasny niebieski
-                    ]
-                },
-                // --- BUDYNKI (Istotne dla analizy biznesowej) ---
-
-                // --- DROGI (Białe dla kontrastu z budynkami) ---
-                {
-                    "featureType": "road",
-                    "elementType": "geometry",
-                    "stylers": [{ "color": "#ffffff" }]
-                },
-                {
-                    "featureType": "road.highway",
-                    "elementType": "geometry",
-                    "stylers": [{ "color": "#ffeb3b" }] // Opcjonalnie: żółte autostrady dla lepszej orientacji w trasach dojazdowych
-                },
-                // --- ETYKIETY TEKSTOWE ---
-                {
-                    "elementType": "labels.text.fill",
-                    "stylers": [{ "color": "#616161" }]
-                },
-                {
-                    "elementType": "labels.text.stroke",
-                    "stylers": [{ "color": "#f5f5f5" }]
-                }
+                { "featureType": "poi", "elementType": "labels", "stylers": [{ "visibility": "off" }] },
+                { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
+                { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+                { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#c5e1a5" }] },
+                { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#b3e5fc" }] },
+                { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }] }
             ];
 
             const map = new google.maps.Map(document.getElementById("map"), {
@@ -202,7 +174,7 @@
                 zoomControl: true
             });
 
-            // 1. RYSOWANIE OKRĘGU WYSZUKIWANIA (Twój zasięg)
+            // Okrąg zasięgu
             new google.maps.Circle({
                 strokeColor: "#0d6efd",
                 strokeOpacity: 0.8,
@@ -211,7 +183,7 @@
                 fillOpacity: 0.15,
                 map,
                 center: centerPoint,
-                radius: searchRadiusKm * 1000, // km -> metry
+                radius: searchRadiusKm * 1000,
                 clickable: false
             });
 
@@ -220,14 +192,12 @@
                 position: centerPoint,
                 map: map,
                 icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                title: "Twoja lokalizacja: @ViewData["SearchLocation"]"
+                title: "Twoja lokalizacja"
             });
 
-            // 2. RYSOWANIE WYNIKÓW
             const infoWindow = new google.maps.InfoWindow();
 
             placesData.forEach((place) => {
-                // Sprawdzamy czy miejsce ma geometrię
                 if (!place.geometry || !place.geometry.location) return;
 
                 const marker = new google.maps.Marker({
@@ -236,62 +206,30 @@
                     title: place.name,
                 });
 
-                // Zdarzenie najechania myszką (opcjonalny mały okrąg przy konkurencji)
-                const competitorCircle = new google.maps.Circle({
-                    strokeColor: "#dc3545", // Czerwony
-                    strokeOpacity: 0.8,
-                    strokeWeight: 1,
-                    fillColor: "#dc3545",
-                    fillOpacity: 0.1,
-                    map: null, // Domyślnie ukryty
-                    center: place.geometry.location,
-                    radius: (searchRadiusKm * 1000) * 1.10,
-                    clickable: false
-                });
-
-                marker.addListener("mouseover", () => {
-                    competitorCircle.setMap(map); // Pokaż okrąg
-                });
-
-                marker.addListener("mouseout", () => {
-                    competitorCircle.setMap(null); // Ukryj okrąg
-                });
-
-                // Kliknięcie - dymek z informacją
                 marker.addListener("click", () => {
-                    // FIX 3: Używamy 'formatted_address' zamiast 'vicinity', bo to mamy w modelu C#
-                    const address = place.formatted_address || "";
-
+                    const address = place.formatted_address || place.vicinity || "";
                     infoWindow.setContent(`
-                                                <div style="padding:10px; min-width: 200px;">
-                                                    <strong style="font-size:1.1em">${place.name}</strong><br>
-                                                    <span class="text-muted" style="font-size:0.9em">${address}</span><br>
-                                                    <div style="margin-top:5px;">
-                                                        Ocena: <strong>${place.rating || "-"}</strong> 
-                                                        <span style="color:#fbc02d">★</span> 
-                                                        <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
-                                                    </div>
-                                                </div>
-                                            `);
+                            <div style="padding:10px; min-width: 200px;">
+                                <strong style="font-size:1.1em">${place.name}</strong><br>
+                                <span class="text-muted" style="font-size:0.9em">${address}</span><br>
+                                <div style="margin-top:5px;">
+                                    Ocena: <strong>${place.rating || "-"}</strong> 
+                                    <span style="color:#fbc02d">★</span> 
+                                    <small class="text-muted">(${place.user_ratings_total || 0})</small>
+                                </div>
+                            </div>
+                        `);
                     infoWindow.open(map, marker);
                 });
             });
         }
     </script>
 
-    <!-- Google Maps script injection (uses model or ViewData) -->
     @{
         var apiKey = Model?.GoogleMapsApiKey as string ?? (ViewData["GoogleMapsApiKey"] as string);
     }
-    @if (string.IsNullOrWhiteSpace(apiKey))
-    {
-        <div class="alert alert-danger">Brak klucza Google Maps. Ustaw <code>GoogleMaps:ApiKey</code> w
-            <code>appsettings.json</code> lub przekaż klucz do widoku.
-        </div>
-    }
-    else
+    @if (!string.IsNullOrWhiteSpace(apiKey))
     {
         <script async defer src='https://maps.googleapis.com/maps/api/js?key=@apiKey&callback=initMap'></script>
     }
-}
 }
