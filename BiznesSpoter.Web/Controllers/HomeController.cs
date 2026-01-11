@@ -25,33 +25,54 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search(string location, string industry, double? radius)
+    public async Task<IActionResult> Search(string location, string industry, double radius)
     {
-        if (string.IsNullOrEmpty(location) || string.IsNullOrEmpty(industry))
+        // 1. Walidacja
+        if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(industry))
         {
             return RedirectToAction("Index");
         }
 
-        double radiusValue = radius ?? 1.0;
-
+        // 2. Pobierz koordynaty z Google
+        // coords to obiekt klasy Location, a nie Nullable<Location>
         var coords = await _placesService.GetCoordinatesAsync(location);
-
+        
         if (coords == null)
         {
-             return RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
-        ViewData["CenterLat"] = coords.Lat;
-        ViewData["CenterLng"] = coords.Lng;
 
-        ViewData["SearchLocation"] = location;
-        ViewData["SearchIndustry"] = industry;
-        ViewData["SearchRadius"] = radiusValue;
+        // 3. Pobierz miejsca z Google
+        // UWAGA: Metoda w serwisie nazywa się SearchPlacesAsync, a nie SearchNearbyAsync
+        // UWAGA 2: Odwołujemy się do coords.Lat, a nie coords.Value.lat
+        var places = await _placesService.SearchPlacesAsync(coords.Lat, coords.Lng, industry, radius);
 
-        var results = await _placesService.SearchPlacesAsync(coords.Lat, coords.Lng, industry, radiusValue);
+        // 4. Pobierz dane z GUS ("Silent Search")
+        GusStatsViewModel? gusStats = null;
+        try 
+        {
+             // Używamy nazwy location wpisanej przez użytkownika
+             gusStats = await _gusService.GetStatsForCityNameAsync(location);
+        }
+        catch 
+        {
+            // Ignorujemy błędy GUS, żeby nie zablokować mapy
+        }
 
-        ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
+        // 5. Zbuduj ViewModel
+        var viewModel = new SearchMapViewModel
+        {
+            Places = places,
+            GusStats = gusStats,
+            SearchLocation = location,
+            SearchIndustry = industry,
+            SearchRadius = radius,
+            CenterLat = coords.Lat, // Poprawione z .Value.lat
+            CenterLng = coords.Lng, // Poprawione z .Value.lng
+            GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"]
+        };
 
-        return View("mapa", results);
+        return View("mapa", viewModel);
     }
     [HttpGet]
     public async Task<IActionResult> GusStats(string city, string unitId)

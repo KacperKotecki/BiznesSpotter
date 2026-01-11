@@ -1,50 +1,80 @@
 @using System.Text.Json
-@model List<BiznesSpoter.Web.Models.PlaceResult>
+@model BiznesSpoter.Web.Models.SearchMapViewModel
 
 @{
     ViewData["Title"] = "Mapa Wyników";
-    var hasData = Model != null && Model.Any();
+    
+    // Sprawdzamy czy lista Places nie jest nullem i czy ma elementy
+    var hasPlaces = Model.Places != null && Model.Places.Any();
+    var hasGusData = Model.GusStats != null;
+
+    // Konfiguracja, żeby pola w JS miały małe litery (np. place.name zamiast place.Name)
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
 }
 
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>@ViewData["Title"]</h1>
-        @if (hasData)
+        @if (hasPlaces)
         {
-            <span class="badge bg-primary fs-5">Znaleziono: @Model.Count</span>
+            <span class="badge bg-primary fs-5">Znaleziono miejsc: @Model.Places!.Count</span>
         }
     </div>
 
-    <!-- Pasek informacyjny o parametrach wyszukiwania -->
+     <!-- Pasek informacyjny o parametrach wyszukiwania -->
     <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4" role="alert">
         <div class="me-auto">
             <strong>Kryteria wyszukiwania:</strong> 
-            Branża: <span class="text-primary fw-bold">@ViewData["SearchIndustry"]</span>, 
-            Lokalizacja: <span class="text-primary fw-bold">@ViewData["SearchLocation"]</span>
+            Branża: <span class="text-primary fw-bold">@Model.SearchIndustry</span>, 
+            Lokalizacja: <span class="text-primary fw-bold">@Model.SearchLocation</span>
         </div>
         <div class="d-flex align-items-center">
             <span class="text-muted me-2 small text-uppercase fw-bold">Promień:</span>
             <span class="badge bg-info text-dark rounded-pill px-3 py-2" style="font-size: 0.9rem;">
-                @ViewData["SearchRadius"] km
+                @Model.SearchRadius km
             </span>
         </div>
     </div>
 
+    <!-- DANE DEMOGRAFICZNE (GUS) -->
+    @if (hasGusData)
+    {
+        <div class="card border-primary mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Dane demograficzne: @Model.GusStats!.CityName</span>
+                <span class="badge bg-white text-primary">Rok: @Model.GusStats.Year</span>
+            </div>
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-0">Liczba mieszkańców</h5>
+                    <small class="text-muted">Źródło: Bank Danych Lokalnych GUS</small>
+                </div>
+                <h2 class="fw-bold text-primary mb-0">
+                    @((Model.GusStats.Population.HasValue) ? Model.GusStats.Population.Value.ToString("N0") : "—")
+                </h2>
+            </div>
+        </div>
+    }
+
     <!-- Przycisk powrotu -->
     <a asp-action="Index" class="btn btn-outline-secondary mb-3">Wróć do wyszukiwania</a>
 
-    @if (!hasData)
+    @if (!hasPlaces)
     {
         <div class="alert alert-warning">
-            Nie znaleziono żadnych miejsc dla podanych kryteriów. Spróbuj zmienić lokalizację lub branżę.
+            Nie znaleziono żadnych miejsc dla podanych kryteriów w Google Maps.
         </div>
     }
     else
     {
-        <!-- 1. MAPA -->
+        <!-- 1. KONTENER MAPY -->
         <div id="map" style="height:500px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"></div>
 
-        <!-- 2. TABELA WYNIKÓW (Przeniesiona z Search.cshtml) -->
+        <!-- 2. TABELA WYNIKÓW -->
         <h3 class="mb-3">Szczegóły znalezionych miejsc</h3>
         <div class="table-responsive">
             <table class="table table-striped table-hover shadow-sm">
@@ -53,28 +83,32 @@
                         <th>Nazwa</th>
                         <th>Adres</th>
                         <th>Ocena</th>
-                        <th>Liczba opinii</th>
-                        <th>Status</th>
+                        <th>Typy</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var place in Model)
+                    @foreach (var place in Model.Places!)
                     {
                         <tr>
-                            <td class="fw-bold">@place.Name</td>
-                            <td>@place.FormattedAddress</td>
+                            <td><strong>@place.Name</strong></td>
+                            <td>@place.Vicinity</td>
                             <td>
                                 @if (place.Rating.HasValue)
                                 {
-                                    <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill"></i></span>
+                                    <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill" style="font-size:0.7em;"></i></span>
+                                    <span class="text-muted small">(@place.UserRatingsTotal opinii)</span>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">—</span>
                                 }
                             </td>
-                            <td>@(place.UserRatingsTotal ?? 0)</td>
-                            <td>@place.BusinessStatus</td>
+                            <td>
+                                @if (place.Types != null)
+                                {
+                                    <small class="text-muted">@string.Join(", ", place.Types.Take(3))</small>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -86,7 +120,7 @@
 @section Scripts {
     <script>
         // Serializujemy dane, aby JavaScript na pewno otrzymał poprawny format JSON
-        const placesData = @Html.Raw(hasData ? JsonSerializer.Serialize(Model) : "[]");
+        const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model) : "[]");
         
         // FIX 1: Używamy JsonSerializer do liczb, aby ZAWSZE była kropka (np. 52.22), a nie przecinek (52,22)
         const centerLat = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLat"] ?? 52.2297));

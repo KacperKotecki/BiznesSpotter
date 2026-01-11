@@ -19,6 +19,14 @@ namespace BiznesSpoter.Web.Models
         [JsonPropertyName("formatted_address")]
         public string? FormattedAddress { get; set; }
 
+        // --- DODAJEMY BRAKUJĄCE POLA ---
+        [JsonPropertyName("vicinity")]
+        public string? Vicinity { get; set; }
+
+        [JsonPropertyName("types")]
+        public List<string>? Types { get; set; }
+        // ------------------------------
+
         [JsonPropertyName("rating")]
         public double? Rating { get; set; }
 

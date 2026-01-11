@@ -141,5 +141,26 @@ namespace BiznesSpoter.Web.Services
 
             return null;
         }
+        
+        public async Task<GusStatsViewModel?> GetStatsForCityNameAsync(string cityName)
+        {
+            if (string.IsNullOrWhiteSpace(cityName))
+                return null;
+
+            // 1. Szukamy jednostek o takiej nazwie
+            var units = await SearchUnitsAsync(cityName);
+
+            if (units == null || !units.Any())
+            {
+                return null; // Nic nie znaleziono
+            }
+
+            // 2. Prosta heurystyka...
+            var bestUnit = units.First();
+            if (bestUnit.Id == null) return null;
+
+            // 3. Pobieramy statystyki
+            return await GetCityStatsByUnitIdAsync(bestUnit.Id);
+        }
     }
 }
