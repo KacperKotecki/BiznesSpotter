@@ -15,6 +15,21 @@
         }
     </div>
 
+    <!-- Pasek informacyjny o parametrach wyszukiwania -->
+    <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4" role="alert">
+        <div class="me-auto">
+            <strong>Kryteria wyszukiwania:</strong> 
+            Branża: <span class="text-primary fw-bold">@ViewData["SearchIndustry"]</span>, 
+            Lokalizacja: <span class="text-primary fw-bold">@ViewData["SearchLocation"]</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="text-muted me-2 small text-uppercase fw-bold">Promień:</span>
+            <span class="badge bg-info text-dark rounded-pill px-3 py-2" style="font-size: 0.9rem;">
+                @ViewData["SearchRadius"] km
+            </span>
+        </div>
+    </div>
+
     <!-- Przycisk powrotu -->
     <a asp-action="Index" class="btn btn-outline-secondary mb-3">Wróć do wyszukiwania</a>
 

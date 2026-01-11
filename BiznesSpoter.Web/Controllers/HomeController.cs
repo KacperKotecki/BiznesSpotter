@@ -9,13 +9,19 @@ namespace BiznesSpoter.Web.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly GooglePlacesService _placesService; // Wstrzykujemy serwis
+    private readonly GooglePlacesService _placesService; 
     private readonly GusService _gusService;
-    public HomeController(ILogger<HomeController> logger, GooglePlacesService placesService, GusService gusService)
+    private readonly IConfiguration _configuration; 
+
+    public HomeController(ILogger<HomeController> logger, 
+                          GooglePlacesService placesService, 
+                          GusService gusService,
+                          IConfiguration configuration)
     {
         _logger = logger;
         _placesService = placesService;
         _gusService = gusService;
+        _configuration = configuration;
     }
 
     [HttpGet]
@@ -26,9 +32,15 @@ public class HomeController : Controller
             return RedirectToAction("Index");
         }
 
-        var results = await _placesService.SearchPlacesAsync(location, industry);
+        double radiusValue = radius ?? 1.0;
 
-        ViewData["GoogleMapsApiKey"] = "AIzaSyAZv4OqA2d1m5m9oQoUk5D83pRHosgrELA"; 
+        var results = await _placesService.SearchPlacesAsync(location, industry, radiusValue);
+
+        ViewData["SearchLocation"] = location;
+        ViewData["SearchIndustry"] = industry;
+        ViewData["SearchRadius"] = radiusValue;
+
+        ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
 
         return View("mapa", results);
     }
