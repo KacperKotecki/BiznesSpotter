@@ -23,17 +23,14 @@ public class HomeController : Controller
     {
         if (string.IsNullOrEmpty(location) || string.IsNullOrEmpty(industry))
         {
-            // Prosta walidacja - powrót na główną jeśli pusto
             return RedirectToAction("Index");
         }
 
-        // Pobieramy dane z Google API
-        // Uwaga: Na tym etapie 'radius' z suwaka jest ignorowany w zapytaniu TextSearch,
-        // ponieważ TextSearch sam dopasowuje obszar do nazwy lokalizacji.
-        // W przyszłości przy 'NearbySearch' radius będzie kluczowy.
         var results = await _placesService.SearchPlacesAsync(location, industry);
 
-        return View(results);
+        ViewData["GoogleMapsApiKey"] = "AIzaSyAZv4OqA2d1m5m9oQoUk5D83pRHosgrELA"; 
+
+        return View("mapa", results);
     }
     [HttpGet]
     public async Task<IActionResult> GusStats(string city, string unitId)
@@ -73,14 +70,6 @@ public class HomeController : Controller
 
     public IActionResult Privacy()
     {
-        return View();
-    }
-
-    [HttpGet]
-    public IActionResult Mapa()
-    {
-        // Klucz API Google Maps przekazywany do widoku
-        ViewData["GoogleMapsApiKey"] = "AIzaSyAZv4OqA2d1m5m9oQoUk5D83pRHosgrELA";
         return View();
     }
 
