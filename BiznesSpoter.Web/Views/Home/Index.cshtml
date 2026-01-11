@@ -30,13 +30,21 @@
                         <label for="industrySelect" class="form-label fw-bold">Branża</label>
                         <select class="form-select form-select-lg" id="industrySelect" name="industry">
                             <option selected disabled>Wybierz kategorię...</option>
-                            <optgroup label="Usługi">
-                                <option value="fryzjer">Fryzjer / Barber</option>
+                            <optgroup label="Uroda i zdrowie">
+                                <option value="fryzjer">Usługi fryzjerskie</option>
                                 <option value="kosmetyczka">Salon kosmetyczny</option>
-                                <option value="mechanik">Warsztat samochodowy</option>
+                                <option value="Tatuaż i piercing">Tatuaż i piercing</option>
+                                <option value="Siłownia i fitness">Siłownia i fitness</option>
+                                <option value="Stomatologia">Stomatologia</option>
+                                <option value="Fizjoterapia">Fizjoterapia</option>
                             </optgroup>
                             <optgroup label="Gastronomia">
                                 <option value="kebab">Kebab / Fast Food</option>
+                                <option value="pizza">Pizza / Fast Food</option>
+                                <option value="Cukiernia">Cukiernia</option>
+                                <option value="Piekarnia">Piekarnia</option>
+                                <option value="Pub">Pub</option>
+                                <option value="Bar">Bar</option>
                                 <option value="kawiarnia">Kawiarnia</option>
                                 <option value="restauracja">Restauracja</option>
                             </optgroup>
@@ -44,6 +52,21 @@
                                 <option value="spożywczy">Sklep spożywczy</option>
                                 <option value="odzież">Butik odzieżowy</option>
                                 <option value="zabka">Franczyza (typu Żabka)</option>
+                                <option value="Sklep zoologiczny">Sklep zoologiczny</option>
+                                <option value="Sklep monopolowy">Sklep monopolowy</option>
+                                <option value="Odzież i tekstylia">Odzież i tekstylia</option>
+                            </optgroup>
+                            <optgroup label="Usługi lokalne">
+                                <option value="mechanik">Warsztat samochodowy</option>
+                                <option value="myjnie samochodowe">Myjnie samochodowe</option>
+                                <option value="Pralnie">Pralnie</option>
+                                <option value="weterynarz">Weterynarz</option>
+                                <option value="Szewstwo">Szewstwo</option>
+                                <option value="Elektronika">Elektronika</option>
+                            </optgroup>
+                            <optgroup label="Edukacja">
+                                <option value="Szkoła Językowa">Szkoła Językowa</option>
+                                <option value="Szkoła Jazdy">Szkoła Jazdy</option>
                             </optgroup>
                         </select>
                     </div>
@@ -152,7 +175,7 @@
     </div>
 </div>
 
-@section Scripts 
+@section Scripts
 {
-<script src="~/js/home-index.js" asp-append-version="true"></script>
+    <script src="~/js/home-index.js" asp-append-version="true"></script>
 }
