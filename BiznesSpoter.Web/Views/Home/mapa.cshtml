@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Mapa Wyników";
-    
+
     // Sprawdzamy czy lista Places nie jest nullem i czy ma elementy
     var hasPlaces = Model.Places != null && Model.Places.Any();
     var hasGusData = Model.GusStats != null;
@@ -25,11 +25,11 @@
         }
     </div>
 
-     <!-- Pasek informacyjny o parametrach wyszukiwania -->
+    <!-- Pasek informacyjny o parametrach wyszukiwania -->
     <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4" role="alert">
         <div class="me-auto">
-            <strong>Kryteria wyszukiwania:</strong> 
-            Branża: <span class="text-primary fw-bold">@Model.SearchIndustry</span>, 
+            <strong>Kryteria wyszukiwania:</strong>
+            Branża: <span class="text-primary fw-bold">@Model.SearchIndustry</span>,
             Lokalizacja: <span class="text-primary fw-bold">@Model.SearchLocation</span>
         </div>
         <div class="d-flex align-items-center">
@@ -45,7 +45,8 @@
     {
         <div class="card border-primary mb-4 shadow-sm">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Dane demograficzne: @Model.GusStats!.CityName</span>
+                <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Dane demograficzne:
+                    @Model.GusStats!.CityName</span>
                 <span class="badge bg-white text-primary">Rok: @Model.GusStats.Year</span>
             </div>
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -72,7 +73,8 @@
     else
     {
         <!-- 1. KONTENER MAPY -->
-        <div id="map" style="height:500px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"></div>
+        <div id="map" style="height:500px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;">
+        </div>
 
         <!-- 2. TABELA WYNIKÓW -->
         <h3 class="mb-3">Szczegóły znalezionych miejsc</h3>
@@ -95,7 +97,8 @@
                             <td>
                                 @if (place.Rating.HasValue)
                                 {
-                                    <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill" style="font-size:0.7em;"></i></span>
+                                    <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill"
+                                            style="font-size:0.7em;"></i></span>
                                     <span class="text-muted small">(@place.UserRatingsTotal opinii)</span>
                                 }
                                 else
@@ -119,8 +122,11 @@
 
 @section Scripts {
     <script>
+
+
         // Serializujemy dane, aby JavaScript na pewno otrzymał poprawny format JSON
-        const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model.Places, jsonOptions) : "[]");
+        const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model) : "[]");
+        
         // FIX 1: Używamy JsonSerializer do liczb, aby ZAWSZE była kropka (np. 52.22), a nie przecinek (52,22)
         const centerLat = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLat"] ?? 52.2297));
         const centerLng = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLng"] ?? 21.0122));
@@ -129,14 +135,78 @@
         function initMap() {
             const centerPoint = { lat: centerLat, lng: centerLng };
 
+            // Uproszczony styl: ukrywamy etykiety i ikony, upraszczamy drogi; NIE ZMIENIAMY "landscape" (teren) — dodajemy wyraźne style dla budynków
+            const simplifiedStyle = [
+                {
+                    "featureType": "poi",
+                    "elementType": "labels",
+                    "stylers": [{ "visibility": "off" }] // Ukrywa domyślne ikony, by nie zasłaniały budynków
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [{ "visibility": "off" }]
+                },
+                {
+                    "elementType": "labels.icon",
+                    "stylers": [{ "visibility": "off" }]
+                },
+
+                // --- PARKI I ZIELEŃ ---
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "visibility": "on" },
+                        { "color": "#c5e1a5" } // Przyjemna, naturalna zieleń
+                    ]
+                },
+                // --- WODA I RZEKI ---
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "visibility": "on" },
+                        { "color": "#b3e5fc" } // Wyraźny, jasny niebieski
+                    ]
+                },
+                // --- BUDYNKI (Istotne dla analizy biznesowej) ---
+
+                // --- DROGI (Białe dla kontrastu z budynkami) ---
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [{ "color": "#ffffff" }]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [{ "color": "#ffeb3b" }] // Opcjonalnie: żółte autostrady dla lepszej orientacji w trasach dojazdowych
+                },
+                // --- ETYKIETY TEKSTOWE ---
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [{ "color": "#616161" }]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{ "color": "#f5f5f5" }]
+                }
+            ];
+
             const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13,
                 center: centerPoint,
+                zoom: 15,
+                styles: simplifiedStyle,
+                clickableIcons: false,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: true
             });
 
             // 1. RYSOWANIE OKRĘGU WYSZUKIWANIA (Twój zasięg)
             new google.maps.Circle({
-                strokeColor: "#0d6efd", 
+                strokeColor: "#0d6efd",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
                 fillColor: "#0d6efd",
@@ -182,35 +252,48 @@
                 });
 
                 marker.addListener("mouseover", () => {
-                   competitorCircle.setMap(map); // Pokaż okrąg
+                    competitorCircle.setMap(map); // Pokaż okrąg
                 });
-                
+
                 marker.addListener("mouseout", () => {
-                   competitorCircle.setMap(null); // Ukryj okrąg
+                    competitorCircle.setMap(null); // Ukryj okrąg
                 });
 
                 // Kliknięcie - dymek z informacją
                 marker.addListener("click", () => {
                     // FIX 3: Używamy 'formatted_address' zamiast 'vicinity', bo to mamy w modelu C#
                     const address = place.formatted_address || "";
-                    
+
                     infoWindow.setContent(`
-                        <div style="padding:10px; min-width: 200px;">
-                            <strong style="font-size:1.1em">${place.name}</strong><br>
-                            <span class="text-muted" style="font-size:0.9em">${address}</span><br>
-                            <div style="margin-top:5px;">
-                                Ocena: <strong>${place.rating || "-"}</strong> 
-                                <span style="color:#fbc02d">★</span> 
-                                <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
-                            </div>
-                        </div>
-                    `);
+                                                <div style="padding:10px; min-width: 200px;">
+                                                    <strong style="font-size:1.1em">${place.name}</strong><br>
+                                                    <span class="text-muted" style="font-size:0.9em">${address}</span><br>
+                                                    <div style="margin-top:5px;">
+                                                        Ocena: <strong>${place.rating || "-"}</strong> 
+                                                        <span style="color:#fbc02d">★</span> 
+                                                        <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
+                                                    </div>
+                                                </div>
+                                            `);
                     infoWindow.open(map, marker);
                 });
             });
         }
     </script>
-    
-    <!-- FIX 2: Pojedyncze cudzysłowy w atrybucie src, aby nie gryzły się z C# -->
-    <script async defer src='https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]&callback=initMap'></script>
+
+    <!-- Google Maps script injection (uses model or ViewData) -->
+    @{
+        var apiKey = Model?.GoogleMapsApiKey as string ?? (ViewData["GoogleMapsApiKey"] as string);
+    }
+    @if (string.IsNullOrWhiteSpace(apiKey))
+    {
+        <div class="alert alert-danger">Brak klucza Google Maps. Ustaw <code>GoogleMaps:ApiKey</code> w
+            <code>appsettings.json</code> lub przekaż klucz do widoku.
+        </div>
+    }
+    else
+    {
+        <script async defer src='https://maps.googleapis.com/maps/api/js?key=@apiKey&callback=initMap'></script>
+    }
+}
 }
