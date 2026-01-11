@@ -85,87 +85,99 @@
 
 @section Scripts {
     <script>
-        // Serializacja danych. 
-        // UWAGA: JsonPropertyName w modelu wymusza małe litery w JSON (np. "geometry" a nie "Geometry")
+        // Serializujemy dane, aby JavaScript na pewno otrzymał poprawny format JSON
         const placesData = @Html.Raw(hasData ? JsonSerializer.Serialize(Model) : "[]");
-
-        // Debugging: Zobacz w konsoli przeglądarki (F12) co dokładnie przyszło
-        console.log("Dane z API:", placesData);
+        
+        // FIX 1: Używamy JsonSerializer do liczb, aby ZAWSZE była kropka (np. 52.22), a nie przecinek (52,22)
+        const centerLat = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLat"] ?? 52.2297));
+        const centerLng = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLng"] ?? 21.0122));
+        const searchRadiusKm = @Html.Raw(JsonSerializer.Serialize(ViewData["SearchRadius"] ?? 1.0));
 
         function initMap() {
-            // Domyślny środek (Warszawa)
-            const defaultCenter = { lat: 52.2297, lng: 21.0122 };
-
-            // Ustawienia wizualne mapy
-            const simplifiedStyle = [
-                { "featureType": "poi", "elementType": "labels", "stylers": [{ "visibility": "off" }] },
-                { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
-                { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "visibility": "on" }, { "color": "#c5e1a5" }] },
-                { "featureType": "water", "elementType": "geometry", "stylers": [{ "visibility": "on" }, { "color": "#b3e5fc" }] }
-            ];
+            const centerPoint = { lat: centerLat, lng: centerLng };
 
             const map = new google.maps.Map(document.getElementById("map"), {
-                center: defaultCenter, 
-                zoom: 10,
-                styles: simplifiedStyle,
-                mapTypeControl: false,
-                streetViewControl: false
+                zoom: 13,
+                center: centerPoint,
             });
 
-            // Jeśli brak danych, nie wykonujemy pętli
-            if (placesData.length === 0) return;
+            // 1. RYSOWANIE OKRĘGU WYSZUKIWANIA (Twój zasięg)
+            new google.maps.Circle({
+                strokeColor: "#0d6efd", 
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#0d6efd",
+                fillOpacity: 0.15,
+                map,
+                center: centerPoint,
+                radius: searchRadiusKm * 1000, // km -> metry
+                clickable: false
+            });
 
-            const bounds = new google.maps.LatLngBounds();
+            // Marker środka
+            new google.maps.Marker({
+                position: centerPoint,
+                map: map,
+                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                title: "Twoja lokalizacja: @ViewData["SearchLocation"]"
+            });
+
+            // 2. RYSOWANIE WYNIKÓW
             const infoWindow = new google.maps.InfoWindow();
-            let validMarkers = 0;
 
-            placesData.forEach(place => {
-                // POPRAWKA KLUCZOWA: Używamy nazw właściwości zgodnych z JSON (małe litery/snake_case)
-                // Wynika to z atrybutów [JsonPropertyName("geometry")] w C#
+            placesData.forEach((place) => {
+                // Sprawdzamy czy miejsce ma geometrię
+                if (!place.geometry || !place.geometry.location) return;
+
+                const marker = new google.maps.Marker({
+                    position: place.geometry.location,
+                    map: map,
+                    title: place.name,
+                });
+
+                // Zdarzenie najechania myszką (opcjonalny mały okrąg przy konkurencji)
+                const competitorCircle = new google.maps.Circle({
+                    strokeColor: "#dc3545", // Czerwony
+                    strokeOpacity: 0.8,
+                    strokeWeight: 1,
+                    fillColor: "#dc3545",
+                    fillOpacity: 0.1,
+                    map: null, // Domyślnie ukryty
+                    center: place.geometry.location,
+                    radius: (searchRadiusKm * 1000) * 1.10,
+                    clickable: false
+                });
+
+                marker.addListener("mouseover", () => {
+                   competitorCircle.setMap(map); // Pokaż okrąg
+                });
                 
-                const geo = place.geometry; // Mała litera!
-                
-                if (geo && geo.location) {
+                marker.addListener("mouseout", () => {
+                   competitorCircle.setMap(null); // Ukryj okrąg
+                });
+
+                // Kliknięcie - dymek z informacją
+                marker.addListener("click", () => {
+                    // FIX 3: Używamy 'formatted_address' zamiast 'vicinity', bo to mamy w modelu C#
+                    const address = place.formatted_address || "";
                     
-                    const position = { 
-                        lat: geo.location.lat, // Mała litera!
-                        lng: geo.location.lng  // Mała litera!
-                    };
-
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        title: place.name // Mała litera!
-                    });
-
-                    bounds.extend(position);
-                    validMarkers++;
-
-                    // Treść dymku
-                    marker.addListener("click", () => {
-                         const contentString = `
-                            <div style="padding:5px; color:black; max-width:200px">
-                                <h6 style="font-weight:bold; margin-bottom:5px;">${place.name}</h6>
-                                <p style="margin:0; font-size:12px; margin-bottom:5px;">${place.formatted_address}</p>
-                                <div style="font-size:11px;">
-                                    <strong>Ocena:</strong> ${place.rating || '-'} (${place.user_ratings_total || 0})<br/>
-                                    <strong>Status:</strong> ${place.business_status || '-'}
-                                </div>
+                    infoWindow.setContent(`
+                        <div style="padding:10px; min-width: 200px;">
+                            <strong style="font-size:1.1em">${place.name}</strong><br>
+                            <span class="text-muted" style="font-size:0.9em">${address}</span><br>
+                            <div style="margin-top:5px;">
+                                Ocena: <strong>${place.rating || "-"}</strong> 
+                                <span style="color:#fbc02d">★</span> 
+                                <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
                             </div>
-                        `;
-                        infoWindow.setContent(contentString);
-                        infoWindow.open(map, marker);
-                    });
-                }
+                        </div>
+                    `);
+                    infoWindow.open(map, marker);
+                });
             });
-
-            // Dopasuj zoom mapy do punktów
-            if (validMarkers > 0) {
-                map.fitBounds(bounds);
-            }
         }
     </script>
     
-    <!-- Ładowanie API Google Maps -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]&callback=initMap"></script>
+    <!-- FIX 2: Pojedyncze cudzysłowy w atrybucie src, aby nie gryzły się z C# -->
+    <script async defer src='https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]&callback=initMap'></script>
 }

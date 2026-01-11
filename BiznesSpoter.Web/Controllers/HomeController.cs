@@ -34,11 +34,20 @@ public class HomeController : Controller
 
         double radiusValue = radius ?? 1.0;
 
-        var results = await _placesService.SearchPlacesAsync(location, industry, radiusValue);
+        var coords = await _placesService.GetCoordinatesAsync(location);
+
+        if (coords == null)
+        {
+             return RedirectToAction("Index");
+        }
+        ViewData["CenterLat"] = coords.Lat;
+        ViewData["CenterLng"] = coords.Lng;
 
         ViewData["SearchLocation"] = location;
         ViewData["SearchIndustry"] = industry;
         ViewData["SearchRadius"] = radiusValue;
+
+        var results = await _placesService.SearchPlacesAsync(coords.Lat, coords.Lng, industry, radiusValue);
 
         ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
 
