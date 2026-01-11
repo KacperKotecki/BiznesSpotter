@@ -59,6 +59,12 @@ public class HomeController : Controller
             // Ignorujemy błędy GUS, żeby nie zablokować mapy
         }
 
+        if (gusStats != null)
+        {
+            // Przekazujemy liczbę biznesów z Google do modelu GUS
+            gusStats.PlacesCount = places.Count;
+        }
+
         // 5. Zbuduj ViewModel
         var viewModel = new SearchMapViewModel
         {
