@@ -150,7 +150,7 @@
         const centerLat = @Html.Raw(JsonSerializer.Serialize(Model.CenterLat));
         const centerLng = @Html.Raw(JsonSerializer.Serialize(Model.CenterLng));
         const searchRadiusKm = @Html.Raw(JsonSerializer.Serialize(Model.SearchRadius));
-
+        
         function initMap() {
             const centerPoint = { lat: centerLat, lng: centerLng };
 
@@ -177,9 +177,11 @@
             // Okrąg zasięgu
             new google.maps.Circle({
                 strokeColor: "#0d6efd",
+                strokeColor: "#2196F3",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
                 fillColor: "#0d6efd",
+                fillColor: "#2196F3",
                 fillOpacity: 0.15,
                 map,
                 center: centerPoint,
@@ -206,6 +208,16 @@
                     title: place.name,
                 });
 
+                const competitorCircle = new google.maps.Circle({
+                    strokeWeight: 0,        // ZMIANA: 0 oznacza brak krawędzi
+                    fillColor: "#FF0000",   // ZMIANA: Czysta, intensywna czerwień
+                    fillOpacity: 0.10,      // ZMIANA: Lekko zwiększona widoczność wypełnienia
+                    map: map,               
+                    center: place.geometry.location,
+                    radius: 300,           
+                    clickable: false
+                });
+
                 marker.addListener("click", () => {
                     const address = place.formatted_address || place.vicinity || "";
                     infoWindow.setContent(`
@@ -223,6 +235,7 @@
                 });
             });
         }
+        
     </script>
 
     @{
