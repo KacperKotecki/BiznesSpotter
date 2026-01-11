@@ -1,178 +1,341 @@
-/* --- ZMIENNE I BAZA --- */
-:root {
-    /* Kolory wiodące (zgodne z Bootstrap primary) */
-    --primary-blue: #0d6efd;
-    --primary-dark: #0a58ca;
-    
-    /* Cienie dla efektu głębi */
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 12px 32px rgba(13, 110, 253, 0.15);
-    
-    /* Tło i krawędzie */
-    --bg-surface: #ffffff;
-    --border-subtle: #e9ecef;
+html {
+  font-size: 14px;
 }
 
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+.card body{
+  border: 1px solid black;
+  margin-top: -50px;
+}
 body {
-    /* Opcjonalnie: jeśli używasz Google Fonts, Inter wygląda tu świetnie */
-    /* font-family: 'Inter', sans-serif; */
-    background-color: #f8f9fa; /* Lekko szare tło dla kontrastu z białymi kartami */
+  margin-bottom: 60px;
+}
+/* Custom Styles for BiznesSpoter Map View */
+
+:root {
+    --primary-color: #0d6efd;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-/* --- ANIMACJE KLUCZOWE --- */
-/* Definicja animacji wjazdu od dołu */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate3d(0, 30px, 0);
-    }
-    to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
+/* Ogólne poprawki kontenera */
+.container {
+    max-width: 1200px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Klasy pomocnicze do animacji (dodamy je do HTML w Kroku 2) */
-.animate-fade-up {
-    opacity: 0; /* Na start niewidoczne */
-    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+/* Stylizacja paska kryteriów wyszukiwania */
+.alert-light {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.5rem !important;
 }
 
-/* Opóźnienia dla efektu kaskady */
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-.delay-4 { animation-delay: 0.4s; }
-
-
-/* --- KOMPONENTY --- */
-
-/* 1. Alert Kryteriów Wyszukiwania */
-.alert-light.border {
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-subtle) !important;
-    box-shadow: var(--shadow-soft) !important;
-    border-radius: 16px;
-    padding: 1.25rem;
-}
-
-/* 2. Nowoczesne Karty Statystyk */
+/* Karty statystyk (GUS) */
 .card {
-    border: none !important;
-    border-radius: 16px !important;
-    background: var(--bg-surface);
-    box-shadow: var(--shadow-medium) !important;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 12px;
     overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Efekt unoszenia dla wszystkich kart */
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover) !important;
+    box-shadow: var(--hover-shadow) !important;
 }
 
-/* Karta Demografii (lewa) */
-.card-header.bg-primary {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+.card-header {
     border-bottom: none;
-    padding: 1.25rem 1.5rem;
-    font-weight: 600;
+    padding: 1rem 1.25rem;
 }
 
-.card-body h2.text-primary {
-    font-size: 2.5rem;
-    font-weight: 800;
+.card-body h2 {
     letter-spacing: -1px;
-    color: var(--primary-dark) !important;
 }
 
-/* Karta Analizy Rynku (prawa) */
-/* Nadpisujemy inline style bordera, żeby pasował do estetyki */
-.card[style*="border-left"] {
-    border-left-width: 6px !important;
-}
-
-/* Badge statusu rynku */
-.px-3.py-2.rounded.text-white {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
-    font-weight: 700;
+/* Wskaźnik rynkowy - animowane wejście */
+.market-status-badge {
+    transition: all 0.3s ease;
+    cursor: default;
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* 3. Kontener Mapy */
+/* Stylizacja mapy */
 #map {
-    border-radius: 20px !important;
-    border: 4px solid var(--bg-surface) !important; /* Biała ramka wokół mapy */
-    box-shadow: var(--shadow-medium) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    border: none !important;
     transition: box-shadow 0.3s ease;
 }
 
 #map:hover {
-    box-shadow: var(--shadow-hover) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* 4. Tabela Wyników Premium */
+/* Tabela wyników */
 .table-responsive {
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    background: var(--bg-surface);
-    overflow: hidden; /* Ważne dla zaokrąglonych rogów tabeli */
-    border: none !important;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .table {
     margin-bottom: 0;
-}
-
-.table thead th {
-    background-color: #2c3e50 !important; /* Ciemniejszy, bardziej elegancki nagłówek */
-    color: #fff;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-    padding: 1.2rem 1rem;
-    border: none;
-}
-
-.table tbody td {
-    padding: 1.2rem 1rem;
     vertical-align: middle;
-    border-color: var(--border-subtle);
-    transition: background-color 0.2s ease;
 }
 
-/* Animacja wierszy tabeli przy wejściu */
-.table tbody tr {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease forwards;
-}
-/* Automatyczne opóźnienia dla pierwszych 10 wierszy */
-.table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.table tbody tr:nth-child(2) { animation-delay: 0.15s; }
-.table tbody tr:nth-child(3) { animation-delay: 0.2s; }
-.table tbody tr:nth-child(4) { animation-delay: 0.25s; }
-.table tbody tr:nth-child(5) { animation-delay: 0.3s; }
-.table tbody tr:nth-child(6) { animation-delay: 0.35s; }
-.table tbody tr:nth-child(7) { animation-delay: 0.4s; }
-.table tbody tr:nth-child(8) { animation-delay: 0.45s; }
-.table tbody tr:nth-child(9) { animation-delay: 0.5s; }
-.table tbody tr:nth-child(10) { animation-delay: 0.55s; }
-
-.table tbody tr:hover td {
-    background-color: rgba(13, 110, 253, 0.03) !important; /* Bardzo subtelny błękit */
+.table thead {
+    background-color: #212529;
 }
 
-.table strong {
-    color: #2c3e50;
-    font-weight: 700;
+.table th {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
 }
 
-/* Stylowanie odznak w tabeli */
+.table td {
+    padding: 1rem;
+    font-size: 0.95rem;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.04) !important;
+}
+
+/* Badge ocen */
 .badge.bg-success {
-    background: linear-gradient(135deg, #28a745, #218838) !important;
+    background-color: #2e7d32 !important; /* Ciemniejsza, bardziej profesjonalna zieleń */
     font-weight: 600;
-    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+}
+
+/* Custom InfoWindow w Google Maps (nadpisanie domyślnych styli) */
+.gm-style-iw-d {
+    overflow: hidden !important;
+}
+
+.gm-style-iw-c {
+    border-radius: 12px !important;
+    padding: 0 !important;
+}
+
+/* RWD - poprawki dla telefonów */
+@media (max-width: 768px) {
+    #map {
+        height: 350px !important;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .badge.fs-5 {
+        margin-top: 10px;
+    }
+}
+/* Custom Styles for BiznesSpoter Map View */
+
+:root {
+    --primary-color: #0d6efd;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Ogólne poprawki kontenera */
+.container {
+    max-width: 1200px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Stylizacja paska kryteriów wyszukiwania */
+.alert-light {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Karty statystyk (GUS) */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--hover-shadow) !important;
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+.card-body h2 {
+    letter-spacing: -1px;
+}
+
+/* Wskaźnik rynkowy - animowane wejście */
+.market-status-badge {
+    transition: all 0.3s ease;
+    cursor: default;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stylizacja mapy */
+#map {
+    border-radius: 16px !important;
+    overflow: hidden;
+    border: none !important;
+    transition: box-shadow 0.3s ease;
+}
+
+#map:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tabela wyników */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table thead {
+    background-color: #212529;
+}
+
+.table th {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    font-size: 0.95rem;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.04) !important;
+}
+
+/* Badge ocen */
+.badge.bg-success {
+    background-color: #2e7d32 !important; /* Ciemniejsza, bardziej profesjonalna zieleń */
+    font-weight: 600;
+}
+
+/* Custom InfoWindow w Google Maps (nadpisanie domyślnych styli) */
+.gm-style-iw-d {
+    overflow: hidden !important;
+}
+
+.gm-style-iw-c {
+    border-radius: 12px !important;
+    padding: 0 !important;
+}
+
+/* RWD - poprawki dla telefonów */
+@media (max-width: 768px) {
+    #map {
+        height: 350px !important;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .badge.fs-5 {
+        margin-top: 10px;
+    }
+}
+/* 1) Więcej miejsca na dole sekcji (bez zmiany HTML)
+   - jeśli container ma py-5, to dokładamy mu dół tylko w tej sekcji */
+.container.py-5 {
+  padding-bottom: 5rem !important; /* zwiększa odstęp od dołu */
+}
+
+/* 2) Wzmocnienie widoczności kart */
+.category-card {
+  background: #ffffff !important;
+
+  /* wyraźniejsza ramka */
+  border: 1px solid #d0d7e2 !important;
+
+  /* mocniejszy, czytelny cień */
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.14),
+    0 6px 14px rgba(15, 23, 42, 0.08) !important;
+
+  border-radius: 18px !important;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* 3) Hover – jeszcze bardziej “wybija” kartę */
+.category-card:hover {
+  transform: translateY(-10px);
+  border-color: #2563eb !important;
+
+  box-shadow:
+    0 28px 60px rgba(15, 23, 42, 0.22),
+    0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* 4) Ikona w kółku – większy kontrast (pasuje do Twojego HTML) */
+.category-card .category-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: #eef2f7;
+
+  /* delikatna ramka, żeby kółko było widoczne */
+  border: 1px solid #dbe3ef;
+}
+
+/* 5) Subtelne wzmocnienie tytułu i tekstu */
+.category-card .card-title {
+  letter-spacing: -0.2px;
+}
+
+.category-card .card-text {
+  line-height: 1.35;
+}
+
+/* 6) (Opcjonalnie) Jeszcze większy odstęp od dołu na małych ekranach */
+@media (max-width: 576px) {
+  .container.py-5 {
+    padding-bottom: 6rem !important;
+  }
 }
