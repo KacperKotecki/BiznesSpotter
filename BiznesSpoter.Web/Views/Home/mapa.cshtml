@@ -1,91 +1,156 @@
+@using System.Text.Json
+@model List<BiznesSpoter.Web.Models.PlaceResult>
+
 @{
-    ViewData["Title"] = "Mapa";
+    ViewData["Title"] = "Mapa Wyników";
+    var hasData = Model != null && Model.Any();
 }
 
 <div class="container my-4">
-    <h1 class="mb-3">@ViewData["Title"]</h1>
-    <div id="map" style="height:600px;width:100%;border:1px solid #ddd;"></div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>@ViewData["Title"]</h1>
+        @if (hasData)
+        {
+            <span class="badge bg-primary fs-5">Znaleziono: @Model.Count</span>
+        }
+    </div>
+
+    <!-- Przycisk powrotu -->
+    <a asp-action="Index" class="btn btn-outline-secondary mb-3">Wróć do wyszukiwania</a>
+
+    @if (!hasData)
+    {
+        <div class="alert alert-warning">
+            Nie znaleziono żadnych miejsc dla podanych kryteriów. Spróbuj zmienić lokalizację lub branżę.
+        </div>
+    }
+    else
+    {
+        <!-- 1. MAPA -->
+        <div id="map" style="height:500px; width:100%; border:1px solid #ddd; border-radius: 8px; margin-bottom: 30px;"></div>
+
+        <!-- 2. TABELA WYNIKÓW (Przeniesiona z Search.cshtml) -->
+        <h3 class="mb-3">Szczegóły znalezionych miejsc</h3>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Adres</th>
+                        <th>Ocena</th>
+                        <th>Liczba opinii</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var place in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@place.Name</td>
+                            <td>@place.FormattedAddress</td>
+                            <td>
+                                @if (place.Rating.HasValue)
+                                {
+                                    <span class="badge bg-success">@place.Rating <i class="bi bi-star-fill"></i></span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@(place.UserRatingsTotal ?? 0)</td>
+                            <td>@place.BusinessStatus</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
 
 @section Scripts {
     <script>
+        // Serializacja danych. 
+        // UWAGA: JsonPropertyName w modelu wymusza małe litery w JSON (np. "geometry" a nie "Geometry")
+        const placesData = @Html.Raw(hasData ? JsonSerializer.Serialize(Model) : "[]");
+
+        // Debugging: Zobacz w konsoli przeglądarki (F12) co dokładnie przyszło
+        console.log("Dane z API:", placesData);
+
         function initMap() {
-            const center = { lat: 52.2297, lng: 21.0122 }; // Warszawa
+            // Domyślny środek (Warszawa)
+            const defaultCenter = { lat: 52.2297, lng: 21.0122 };
 
-
-
-            // Uproszczony styl: ukrywamy etykiety i ikony, upraszczamy drogi; NIE ZMIENIAMY "landscape" (teren) — dodajemy wyraźne style dla budynków
+            // Ustawienia wizualne mapy
             const simplifiedStyle = [
-                {
-                    "featureType": "poi",
-                    "elementType": "labels",
-                    "stylers": [{ "visibility": "off" }] // Ukrywa domyślne ikony, by nie zasłaniały budynków
-                },
-                {
-                    "featureType": "transit",
-                    "stylers": [{ "visibility": "off" }]
-                },
-                {
-                    "elementType": "labels.icon",
-                    "stylers": [{ "visibility": "off" }]
-                },
-
-                // --- PARKI I ZIELEŃ ---
-                {
-                    "featureType": "poi.park",
-                    "elementType": "geometry",
-                    "stylers": [
-                        { "visibility": "on" },
-                        { "color": "#c5e1a5" } // Przyjemna, naturalna zieleń
-                    ]
-                },
-                // --- WODA I RZEKI ---
-                {
-                    "featureType": "water",
-                    "elementType": "geometry",
-                    "stylers": [
-                        { "visibility": "on" },
-                        { "color": "#b3e5fc" } // Wyraźny, jasny niebieski
-                    ]
-                },
-                // --- BUDYNKI (Istotne dla analizy biznesowej) ---
-
-                // --- DROGI (Białe dla kontrastu z budynkami) ---
-                {
-                    "featureType": "road",
-                    "elementType": "geometry",
-                    "stylers": [{ "color": "#ffffff" }]
-                },
-                {
-                    "featureType": "road.highway",
-                    "elementType": "geometry",
-                    "stylers": [{ "color": "#ffeb3b" }] // Opcjonalnie: żółte autostrady dla lepszej orientacji w trasach dojazdowych
-                },
-                // --- ETYKIETY TEKSTOWE ---
-                {
-                    "elementType": "labels.text.fill",
-                    "stylers": [{ "color": "#616161" }]
-                },
-                {
-                    "elementType": "labels.text.stroke",
-                    "stylers": [{ "color": "#f5f5f5" }]
-                }
+                { "featureType": "poi", "elementType": "labels", "stylers": [{ "visibility": "off" }] },
+                { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
+                { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "visibility": "on" }, { "color": "#c5e1a5" }] },
+                { "featureType": "water", "elementType": "geometry", "stylers": [{ "visibility": "on" }, { "color": "#b3e5fc" }] }
             ];
 
-
-
             const map = new google.maps.Map(document.getElementById("map"), {
-                center: center,
-                zoom: 15,
+                center: defaultCenter, 
+                zoom: 10,
                 styles: simplifiedStyle,
-                clickableIcons: false,
                 mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
-                zoomControl: true
+                streetViewControl: false
             });
+
+            // Jeśli brak danych, nie wykonujemy pętli
+            if (placesData.length === 0) return;
+
+            const bounds = new google.maps.LatLngBounds();
+            const infoWindow = new google.maps.InfoWindow();
+            let validMarkers = 0;
+
+            placesData.forEach(place => {
+                // POPRAWKA KLUCZOWA: Używamy nazw właściwości zgodnych z JSON (małe litery/snake_case)
+                // Wynika to z atrybutów [JsonPropertyName("geometry")] w C#
+                
+                const geo = place.geometry; // Mała litera!
+                
+                if (geo && geo.location) {
+                    
+                    const position = { 
+                        lat: geo.location.lat, // Mała litera!
+                        lng: geo.location.lng  // Mała litera!
+                    };
+
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: place.name // Mała litera!
+                    });
+
+                    bounds.extend(position);
+                    validMarkers++;
+
+                    // Treść dymku
+                    marker.addListener("click", () => {
+                         const contentString = `
+                            <div style="padding:5px; color:black; max-width:200px">
+                                <h6 style="font-weight:bold; margin-bottom:5px;">${place.name}</h6>
+                                <p style="margin:0; font-size:12px; margin-bottom:5px;">${place.formatted_address}</p>
+                                <div style="font-size:11px;">
+                                    <strong>Ocena:</strong> ${place.rating || '-'} (${place.user_ratings_total || 0})<br/>
+                                    <strong>Status:</strong> ${place.business_status || '-'}
+                                </div>
+                            </div>
+                        `;
+                        infoWindow.setContent(contentString);
+                        infoWindow.open(map, marker);
+                    });
+                }
+            });
+
+            // Dopasuj zoom mapy do punktów
+            if (validMarkers > 0) {
+                map.fitBounds(bounds);
+            }
         }
     </script>
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]&callback=initMap"></script>
+    
+    <!-- Ładowanie API Google Maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewData["GoogleMapsApiKey"]&callback=initMap"></script>
 }
