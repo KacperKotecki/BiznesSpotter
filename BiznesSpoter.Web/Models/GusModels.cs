@@ -56,8 +56,11 @@ namespace BiznesSpoter.Web.Models
     public class GusStatsViewModel
     {
         public string? CityName { get; set; }
-        public double Population { get; set; } // Ludność
-        public double Unemployed { get; set; } // Bezrobotni (przykładowo)
+        // Basic info
+        public string? UnitId { get; set; }
+        public int? UnitLevel { get; set; }
+        public double? Population { get; set; } // Ludność (nullable when unavailable)
+        public double? Unemployed { get; set; } // Bezrobotni (przykładowo)
         public string? Year { get; set; }
     }
 }

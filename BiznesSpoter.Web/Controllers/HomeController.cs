@@ -36,13 +36,35 @@ public class HomeController : Controller
         return View(results);
     }
     [HttpGet]
-    public async Task<IActionResult> GusStats(string city)
+    public async Task<IActionResult> GusStats(string city, string unitId)
     {
-        if (string.IsNullOrWhiteSpace(city))
+        if (string.IsNullOrWhiteSpace(city) && string.IsNullOrWhiteSpace(unitId))
             return RedirectToAction("Index");
 
-        var stats = await _gusService.GetCityStatsAsync(city);
-        return View(stats);
+        // If unitId provided, fetch directly by id
+        if (!string.IsNullOrWhiteSpace(unitId))
+        {
+            var statsById = await _gusService.GetCityStatsByUnitIdAsync(unitId);
+            return View(statsById);
+        }
+
+        // Otherwise search for candidates
+        var candidates = await _gusService.SearchUnitsAsync(city);
+        if (candidates == null || candidates.Count == 0)
+        {
+            var stats = await _gusService.GetCityStatsAsync(city);
+            return View(stats);
+        }
+
+        if (candidates.Count > 1)
+        {
+            return View("SelectGusUnit", candidates);
+        }
+
+        // single candidate
+        var single = candidates.First();
+        var statsSingle = await _gusService.GetCityStatsByUnitIdAsync(single.Id ?? string.Empty);
+        return View(statsSingle);
     }
     public IActionResult Index()
     {
