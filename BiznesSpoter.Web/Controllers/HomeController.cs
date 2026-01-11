@@ -51,14 +51,6 @@ public class HomeController : Controller
         return View();
     }
 
-    [HttpGet]
-    public IActionResult Mapa()
-    {
-        // Klucz API Google Maps przekazywany do widoku
-        ViewData["GoogleMapsApiKey"] = "AIzaSyAZv4OqA2d1m5m9oQoUk5D83pRHosgrELA";
-        return View();
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
