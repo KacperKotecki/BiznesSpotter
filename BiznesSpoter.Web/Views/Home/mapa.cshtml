@@ -120,8 +120,7 @@
 @section Scripts {
     <script>
         // Serializujemy dane, aby JavaScript na pewno otrzymał poprawny format JSON
-        const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model) : "[]");
-        
+        const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model.Places, jsonOptions) : "[]");
         // FIX 1: Używamy JsonSerializer do liczb, aby ZAWSZE była kropka (np. 52.22), a nie przecinek (52,22)
         const centerLat = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLat"] ?? 52.2297));
         const centerLng = @Html.Raw(JsonSerializer.Serialize(ViewData["CenterLng"] ?? 21.0122));
