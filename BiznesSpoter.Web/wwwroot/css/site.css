@@ -16,7 +16,326 @@ html {
   position: relative;
   min-height: 100%;
 }
-
+.card body{
+  border: 1px solid black;
+  margin-top: -50px;
+}
 body {
   margin-bottom: 60px;
+}
+/* Custom Styles for BiznesSpoter Map View */
+
+:root {
+    --primary-color: #0d6efd;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Ogólne poprawki kontenera */
+.container {
+    max-width: 1200px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Stylizacja paska kryteriów wyszukiwania */
+.alert-light {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Karty statystyk (GUS) */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--hover-shadow) !important;
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+.card-body h2 {
+    letter-spacing: -1px;
+}
+
+/* Wskaźnik rynkowy - animowane wejście */
+.market-status-badge {
+    transition: all 0.3s ease;
+    cursor: default;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stylizacja mapy */
+#map {
+    border-radius: 16px !important;
+    overflow: hidden;
+    border: none !important;
+    transition: box-shadow 0.3s ease;
+}
+
+#map:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tabela wyników */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table thead {
+    background-color: #212529;
+}
+
+.table th {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    font-size: 0.95rem;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.04) !important;
+}
+
+/* Badge ocen */
+.badge.bg-success {
+    background-color: #2e7d32 !important; /* Ciemniejsza, bardziej profesjonalna zieleń */
+    font-weight: 600;
+}
+
+/* Custom InfoWindow w Google Maps (nadpisanie domyślnych styli) */
+.gm-style-iw-d {
+    overflow: hidden !important;
+}
+
+.gm-style-iw-c {
+    border-radius: 12px !important;
+    padding: 0 !important;
+}
+
+/* RWD - poprawki dla telefonów */
+@media (max-width: 768px) {
+    #map {
+        height: 350px !important;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .badge.fs-5 {
+        margin-top: 10px;
+    }
+}
+/* Custom Styles for BiznesSpoter Map View */
+
+:root {
+    --primary-color: #0d6efd;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Ogólne poprawki kontenera */
+.container {
+    max-width: 1200px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Stylizacja paska kryteriów wyszukiwania */
+.alert-light {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Karty statystyk (GUS) */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--hover-shadow) !important;
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+.card-body h2 {
+    letter-spacing: -1px;
+}
+
+/* Wskaźnik rynkowy - animowane wejście */
+.market-status-badge {
+    transition: all 0.3s ease;
+    cursor: default;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stylizacja mapy */
+#map {
+    border-radius: 16px !important;
+    overflow: hidden;
+    border: none !important;
+    transition: box-shadow 0.3s ease;
+}
+
+#map:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tabela wyników */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table thead {
+    background-color: #212529;
+}
+
+.table th {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    font-size: 0.95rem;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.04) !important;
+}
+
+/* Badge ocen */
+.badge.bg-success {
+    background-color: #2e7d32 !important; /* Ciemniejsza, bardziej profesjonalna zieleń */
+    font-weight: 600;
+}
+
+/* Custom InfoWindow w Google Maps (nadpisanie domyślnych styli) */
+.gm-style-iw-d {
+    overflow: hidden !important;
+}
+
+.gm-style-iw-c {
+    border-radius: 12px !important;
+    padding: 0 !important;
+}
+
+/* RWD - poprawki dla telefonów */
+@media (max-width: 768px) {
+    #map {
+        height: 350px !important;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .badge.fs-5 {
+        margin-top: 10px;
+    }
+}
+/* 1) Więcej miejsca na dole sekcji (bez zmiany HTML)
+   - jeśli container ma py-5, to dokładamy mu dół tylko w tej sekcji */
+.container.py-5 {
+  padding-bottom: 5rem !important; /* zwiększa odstęp od dołu */
+}
+
+/* 2) Wzmocnienie widoczności kart */
+.category-card {
+  background: #ffffff !important;
+
+  /* wyraźniejsza ramka */
+  border: 1px solid #d0d7e2 !important;
+
+  /* mocniejszy, czytelny cień */
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.14),
+    0 6px 14px rgba(15, 23, 42, 0.08) !important;
+
+  border-radius: 18px !important;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* 3) Hover – jeszcze bardziej “wybija” kartę */
+.category-card:hover {
+  transform: translateY(-10px);
+  border-color: #2563eb !important;
+
+  box-shadow:
+    0 28px 60px rgba(15, 23, 42, 0.22),
+    0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* 4) Ikona w kółku – większy kontrast (pasuje do Twojego HTML) */
+.category-card .category-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: #eef2f7;
+
+  /* delikatna ramka, żeby kółko było widoczne */
+  border: 1px solid #dbe3ef;
+}
+
+/* 5) Subtelne wzmocnienie tytułu i tekstu */
+.category-card .card-title {
+  letter-spacing: -0.2px;
+}
+
+.category-card .card-text {
+  line-height: 1.35;
+}
+
+/* 6) (Opcjonalnie) Jeszcze większy odstęp od dołu na małych ekranach */
+@media (max-width: 576px) {
+  .container.py-5 {
+    padding-bottom: 6rem !important;
+  }
 }

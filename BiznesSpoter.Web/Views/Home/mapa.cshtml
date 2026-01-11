@@ -247,16 +247,16 @@
                 marker.addListener("click", () => {
                     const address = place.formatted_address || place.vicinity || "";
                     infoWindow.setContent(`
-                            <div style="padding:10px; min-width: 200px;">
-                                <strong style="font-size:1.1em">${place.name}</strong><br>
-                                <span class="text-muted" style="font-size:0.9em">${address}</span><br>
-                                <div style="margin-top:5px;">
-                                    Ocena: <strong>${place.rating || "-"}</strong> 
-                                    <span style="color:#fbc02d">★</span> 
-                                    <small class="text-muted">(${place.user_ratings_total || 0})</small>
-                                </div>
-                            </div>
-                        `);
+                                    <div style="padding:10px; min-width: 200px;">
+                                        <strong style="font-size:1.1em">${place.name}</strong><br>
+                                        <span class="text-muted" style="font-size:0.9em">${address}</span><br>
+                                        <div style="margin-top:5px;">
+                                            Ocena: <strong>${place.rating || "-"}</strong> 
+                                            <span style="color:#fbc02d">★</span> 
+                                            <small class="text-muted">(${place.user_ratings_total || 0})</small>
+                                        </div>
+                                    </div>
+                                `);
                     infoWindow.open(map, marker);
                 });
             });
