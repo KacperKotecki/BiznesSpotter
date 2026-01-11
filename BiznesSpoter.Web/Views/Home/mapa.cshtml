@@ -23,68 +23,105 @@
         }
     </div>
 
-    <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4" role="alert">
-        <div class="me-auto">
-            <strong>Kryteria wyszukiwania:</strong>
-            Branża: <span class="text-primary fw-bold">@Model.SearchIndustry</span>,
-            Lokalizacja: <span class="text-primary fw-bold">@Model.SearchLocation</span>
-        </div>
-        <div class="d-flex align-items-center">
-            <span class="text-muted me-2 small text-uppercase fw-bold">Promień:</span>
-            <span class="badge bg-info text-dark rounded-pill px-3 py-2" style="font-size: 0.9rem;">
-                @Model.SearchRadius km
-            </span>
+    <!-- ZMIANA 1: Kryteria w stylu karty z paskiem -->
+    <div class="card border-0 shadow-sm mb-4" style="border-left: 8px solid #0d6efd !important;">
+        <div class="card-body py-3 d-flex align-items-center">
+            <div class="me-auto">
+                <h5 class="fw-bold mb-1">Kryteria wyszukiwania</h5>
+                <span class="text-muted">Branża:</span> <span class="fw-bold text-dark">@Model.SearchIndustry</span>,
+                <span class="text-muted">Lokalizacja:</span> <span class="fw-bold text-dark">@Model.SearchLocation</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-2 small text-uppercase fw-bold">Promień:</span>
+                <span class="badge bg-light text-dark border px-3 py-2" style="font-size: 0.9rem;">
+                    @Model.SearchRadius km
+                </span>
+            </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-5">
+        <div class="row g-4 mb-4">
+        <!-- Lewa kolumna: Demografia -->
+        <div class="col-md-6">
             @if (hasGusData)
             {
-                <div class="card border-primary h-100 shadow-sm">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <span class="fw-bold"><i class="bi bi-people-fill me-2"></i>Demografia:
-                            @Model.GusStats!.CityName</span>
-                        <span class="badge bg-white text-primary">@Model.GusStats.Year</span>
-                    </div>
-                    <div class="card-body py-4">
-                        <p class="text-muted small text-uppercase mb-1">Liczba mieszkańców</p>
-                        <h2 class="fw-bold text-primary mb-0">
-                            @((Model.GusStats.Population.HasValue) ? Model.GusStats.Population.Value.ToString("N0") : "—")
-                        </h2>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <div class="col-md-7">
-            @if (hasGusData)
-            {
-                <div class="card h-100 shadow-sm border-0"
-                    style="border-left: 8px solid @Model.GusStats!.MarketStatusColor !important;">
-                    <div class="card-body py-3">
-                        <h5 class="fw-bold mb-1">Analiza Powodzenia Biznesu</h5>
-                        <p class="text-muted small mb-3">
-                            Na 1 firmę przypada ok. <strong>@Model.GusStats.ResidentsPerBusiness.ToString("N0")</strong>
-                            mieszkańców.
-                        </p>
-
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="px-3 py-2 rounded text-white fw-bold shadow-sm"
-                                style="background-color: @Model.GusStats.MarketStatusColor">
-                                @Model.GusStats.MarketStatusText
+                <div class="card h-100 shadow-sm border-0" style="border-left: 8px solid #0d6efd !important;">
+                    <div class="card-body py-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-1 d-flex align-items-center">
+                                    <i class="bi bi-people-fill me-2 fs-4 text-primary"></i>
+                                    Demografia
+                                </h5>
+                                <span class="badge bg-light text-secondary border">Rok: @Model.GusStats!.Year</span>
                             </div>
-                            <div class="small text-muted">
-                                Wskaźnik: <strong>@Model.GusStats.CompetitionIndex.ToString("F2")</strong> <br />
-                                <small>(placówek / 10k mieszk.)</small>
-                            </div>
+                            <p class="text-muted mb-4 small">Obszar: <strong>@Model.GusStats.CityName</strong></p>
+                        </div>
+
+                        <!-- Usunięto bg-light i bg-opacity, teraz jest czyste tło -->
+                        <div class="text-center mt-auto">
+                            <span class="text-muted text-uppercase fw-bold small ls-1">Populacja miasta</span>
+                            <h1 class="display-4 fw-bold text-dark mb-0 mt-1">
+                                @((Model.GusStats.Population.HasValue) ? Model.GusStats.Population.Value.ToString("N0") : "—")
+                            </h1>
+                            <small class="text-muted">mieszkańców ogółem</small>
                         </div>
                     </div>
                 </div>
             }
         </div>
-    </div>
 
+        <!-- Prawa kolumna: Analiza Rynku -->
+        <div class="col-md-6">
+            @if (hasGusData)
+            {
+                <div class="card h-100 shadow-sm border-0"
+                     style="border-left: 8px solid @Model.GusStats!.MarketStatusColor !important;">
+                    <div class="card-body py-4 d-flex flex-column">
+                        
+                        <!-- Sekcja górna: Nagłówek i Status -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-1 d-flex align-items-center">
+                                <i class="bi bi-graph-up-arrow me-2 fs-4" style="color: @Model.GusStats.MarketStatusColor"></i>
+                                Analiza Nasycenia
+                            </h5>
+                            <p class="mb-0 mt-2 fw-bold fs-5" style="color: @Model.GusStats.MarketStatusColor">
+                                @Model.GusStats.MarketStatusText
+                            </p>
+                        </div>
+
+                        <!-- Sekcja dolna: Dwie duże liczby (50% / 50%) -->
+                        <div class="row g-0 mt-auto align-items-center">
+                            
+                            <!-- Lewa strona: Potencjał -->
+                            <div class="col-6 border-end">
+                                <div class="text-center px-1">
+                                    <span class="text-muted text-uppercase fw-bold small" style="font-size: 0.7rem; letter-spacing: 0.5px;">Potencjalni klienci</span>
+                                    <div class="display-6 fw-bold my-2 text-dark">
+                                        @Model.GusStats.ResidentsPerBusiness.ToString("N0")
+                                    </div>
+                                    <small class="text-muted lh-1 d-block" style="font-size: 0.85rem;">osób na 1 punkt</small>
+                                </div>
+                            </div>
+
+                            <!-- Prawa strona: Indeks -->
+                            <div class="col-6">
+                                <div class="text-center px-1">
+                                    <span class="text-muted text-uppercase fw-bold small" style="font-size: 0.7rem; letter-spacing: 0.5px;">Indeks Konkurencji</span>
+                                    <div class="display-6 fw-bold my-2" style="color: @Model.GusStats.MarketStatusColor">
+                                        @Model.GusStats.CompetitionIndex.ToString("N2")
+                                    </div>
+                                    <small class="text-muted lh-1 d-block" style="font-size: 0.85rem;">pkt / 10k mieszk.</small>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
     @if (!hasPlaces)
     {
         <div class="alert alert-warning">
@@ -100,12 +137,11 @@
         <h3 class="mb-3">Szczegóły znalezionych miejsc</h3>
         <div class="table-responsive mb-5">
             <table class="table table-striped table-hover shadow-sm border">
-                <thead class="table-dark">
+                <thead class="bg-primary text-white">
                     <tr>
                         <th>Nazwa</th>
                         <th>Adres</th>
                         <th>Ocena</th>
-                        <th>Typy</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,12 +160,6 @@
                                 else
                                 {
                                     <span class="text-muted">—</span>
-                                }
-                            </td>
-                            <td>
-                                @if (place.Types != null)
-                                {
-                                    <small class="text-muted">@string.Join(", ", place.Types.Take(3))</small>
                                 }
                             </td>
                         </tr>
