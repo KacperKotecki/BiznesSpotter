@@ -13,6 +13,25 @@ namespace BiznesSpoter.Web.Services
             _httpClient = httpClient;
         }
 
+        // Szuka jednostek po nazwie (zwraca listę kandydatów)
+        public async Task<List<GusUnit>> SearchUnitsAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return new List<GusUnit>();
+            var url = $"{BaseUrl}/units/search?name={Uri.EscapeDataString(name)}&format=json&page-size=100";
+            var resp = await _httpClient.GetAsync(url);
+            if (!resp.IsSuccessStatusCode) return new List<GusUnit>();
+            var content = await resp.Content.ReadAsStringAsync();
+            try
+            {
+                var data = JsonSerializer.Deserialize<GusSearchResponse>(content);
+                return data?.Results ?? new List<GusUnit>();
+            }
+            catch
+            {
+                return new List<GusUnit>();
+            }
+        }
+
         public async Task<GusStatsViewModel?> GetCityStatsAsync(string cityName)
         {
             // 1. Znajdź ID miasta (jednostki terytorialnej)
@@ -49,6 +68,78 @@ namespace BiznesSpoter.Web.Services
                 Population = latestValue.Val,
                 Year = latestValue.Year
             };
+        }
+
+        // Pobierz statystyki po identyfikatorze jednostki
+        public async Task<GusStatsViewModel?> GetCityStatsByUnitIdAsync(string unitId)
+        {
+            if (string.IsNullOrWhiteSpace(unitId)) return null;
+
+            // Najpierw pobierz nazwę jednostki (jeśli możliwe)
+            string? unitName = unitId;
+            try
+            {
+                var metaUrl = $"{BaseUrl}/units/{Uri.EscapeDataString(unitId)}?format=json";
+                var metaResp = await _httpClient.GetAsync(metaUrl);
+                if (metaResp.IsSuccessStatusCode)
+                {
+                    var mcontent = await metaResp.Content.ReadAsStringAsync();
+                    var meta = JsonSerializer.Deserialize<GusSearchResponse>(mcontent);
+                    // GusSearchResponse may not be the exact shape; try simple parse
+                    using var doc = JsonDocument.Parse(mcontent);
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("name", out var pname) && pname.ValueKind == JsonValueKind.String)
+                        unitName = pname.GetString();
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            // Spróbuj pobrać dane (ludność) przez /data/by-unit
+            var dataUrl = $"{BaseUrl}/data/by-unit/{Uri.EscapeDataString(unitId)}?var-id=72305&format=json&page-size=1";
+            var dataResp = await _httpClient.GetAsync(dataUrl);
+            if (dataResp.IsSuccessStatusCode)
+            {
+                var content = await dataResp.Content.ReadAsStringAsync();
+                try
+                {
+                    var d = JsonSerializer.Deserialize<GusDataDataResponse>(content);
+                    var latest = d?.Results?.FirstOrDefault()?.Values?.OrderByDescending(v => v.Year).FirstOrDefault();
+                    if (latest != null)
+                    {
+                        return new GusStatsViewModel { CityName = unitName, UnitId = unitId, Population = latest.Val, Year = latest.Year };
+                    }
+                }
+                catch
+                {
+                    // fallthrough to try localities
+                }
+            }
+
+            // Jeśli powyżej nic nie dało, spróbuj /data/localities/by-unit (dla miejscowości statystycznych)
+            var dataUrl2 = $"{BaseUrl}/data/localities/by-unit/{Uri.EscapeDataString(unitId)}?var-id=72305&format=json&page-size=1";
+            var dataResp2 = await _httpClient.GetAsync(dataUrl2);
+            if (dataResp2.IsSuccessStatusCode)
+            {
+                var content2 = await dataResp2.Content.ReadAsStringAsync();
+                try
+                {
+                    var d2 = JsonSerializer.Deserialize<GusDataDataResponse>(content2);
+                    var latest2 = d2?.Results?.FirstOrDefault()?.Values?.OrderByDescending(v => v.Year).FirstOrDefault();
+                    if (latest2 != null)
+                    {
+                        return new GusStatsViewModel { CityName = unitName, UnitId = unitId, Population = latest2.Val, Year = latest2.Year };
+                    }
+                }
+                catch
+                {
+                    // nothing
+                }
+            }
+
+            return null;
         }
     }
 }

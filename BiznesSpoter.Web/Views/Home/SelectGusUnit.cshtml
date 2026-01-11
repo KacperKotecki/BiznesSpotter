@@ -1,0 +1,25 @@
+@model List<BiznesSpoter.Web.Models.GusUnit>
+
+@{
+    ViewData["Title"] = "Wybierz jednostkę";
+}
+
+<div class="container py-4">
+    <h2>Wybierz poprawną jednostkę</h2>
+    <p>Znaleziono kilka jednostek o podanej nazwie — wybierz tę, której dotyczy analiza:</p>
+    <ul class="list-group">
+        @foreach (var u in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@u.Name</strong>
+                    <div class="text-muted small">Poziom: @u.LevelId — ID: @u.Id</div>
+                </div>
+                <a class="btn btn-sm btn-primary" asp-action="GusStats" asp-route-city="" asp-route-unitId="@u.Id">Wybierz</a>
+            </li>
+        }
+    </ul>
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-link">Anuluj</a>
+    </div>
+</div>
