@@ -142,7 +142,6 @@
                         <th>Nazwa</th>
                         <th>Adres</th>
                         <th>Ocena</th>
-                        <th>Typy</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -161,12 +160,6 @@
                                 else
                                 {
                                     <span class="text-muted">—</span>
-                                }
-                            </td>
-                            <td>
-                                @if (place.Types != null)
-                                {
-                                    <small class="text-muted">@string.Join(", ", place.Types.Take(3))</small>
                                 }
                             </td>
                         </tr>
