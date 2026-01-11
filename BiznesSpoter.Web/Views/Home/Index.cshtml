@@ -2,32 +2,31 @@
     ViewData["Title"] = "Strona Główna";
 }
 <link rel="stylesheet" href="~/css/home-index.css" asp-append-version="true" />
-<!-- 1. Sekcja Hero -->
-<div class="hero-section shadow-sm">
-    <div class="container">
+
+<div class="hero-section shadow-sm animate__animated animate__fadeIn">
+    <div class="container text-center">
         <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
-        <p class="lead mb-4">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
+        <p class="lead mb-4 opacity-75">Analiza lokalizacji, potencjału klientów i konkurencji w jednym miejscu.</p>
     </div>
 </div>
 
-<!-- 2. Główny Formularz (Search Box) -->
 <div class="container search-container mb-5">
     <div class="card shadow border-0">
-        <div class="card-body p-4">
+        <div class="card-body p-4 p-lg-5">
             <form asp-controller="Home" asp-action="Search" method="get">
                 <div class="row g-3">
 
-                    <!-- Lokalizacja -->
                     <div class="col-lg-4 col-md-6">
-                        <label for="locationInput" class="form-label fw-bold">Lokalizacja</label>
+                        <label for="locationInput" class="form-label fw-bold"><i
+                                class="bi bi-geo-alt me-2 text-primary"></i>Lokalizacja</label>
                         <input type="text" class="form-control form-control-lg" id="locationInput" name="location"
                             placeholder="Np. Warszawa, Mokotów">
                         <div class="form-text">Wpisz miasto lub dzielnicę.</div>
                     </div>
 
-                    <!-- Branża -->
                     <div class="col-lg-4 col-md-6">
-                        <label for="industrySelect" class="form-label fw-bold">Branża</label>
+                        <label for="industrySelect" class="form-label fw-bold"><i
+                                class="bi bi-briefcase me-2 text-primary"></i>Branża</label>
                         <select class="form-select form-select-lg" id="industrySelect" name="industry">
                             <option selected disabled>Wybierz kategorię...</option>
                             <optgroup label="Uroda i zdrowie">
@@ -71,11 +70,10 @@
                         </select>
                     </div>
 
-                    <!-- Promień analizy (Slider) -->
                     <div class="col-lg-4 col-md-12">
                         <label for="radiusRange" class="form-label fw-bold d-flex justify-content-between">
                             Promień analizy
-                            <span id="radiusValue" class="badge bg-primary">1.0 km</span>
+                            <span id="radiusValue" class="badge bg-primary rounded-pill">1.0 km</span>
                         </label>
                         <input type="range" class="form-range" min="0.5" max="5.0" step="0.5" id="radiusRange"
                             name="radius" value="1.0" oninput="updateRadius(this.value)">
@@ -85,9 +83,8 @@
                         </div>
                     </div>
 
-                    <!-- Przycisk -->
                     <div class="col-12 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow-sm">
                             <i class="bi bi-search me-2"></i> Analizuj potencjał
                         </button>
                     </div>
@@ -97,85 +94,86 @@
     </div>
 </div>
 
-<!-- 3. Sekcja "Szybki Wybór" -->
 <div class="container py-5">
-    <div class="text-center mb-4">
+    <div class="text-center mb-5">
         <h3 class="fw-bold text-secondary">Szybki wybór popularnych branż</h3>
+        <div class="mx-auto bg-primary rounded" style="height: 3px; width: 50px;"></div>
     </div>
 
     <div class="row g-4 justify-content-center">
-        <!-- Fryzjer -->
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card h-100 text-center p-3 category-card shadow-sm">
+            <div class="card h-100 text-center p-4 category-card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="category-icon">✂️</div>
-                    <!-- Można zamienić na <i class="bi bi-scissors"></i> jeśli masz Bootstrap Icons -->
-                    <h5 class="card-title">Fryzjer</h5>
+                    <div class="category-icon mb-3"><i class="bi bi-scissors text-primary fs-2"></i></div>
+                    <h5 class="card-title fw-bold">Fryzjer</h5>
                     <p class="card-text small text-muted">Wysoki popyt lokalny.</p>
-                    <a href="#" class="stretched-link"></a>
+                    <a href="/Home/Search?location=Warszawa&industry=fryzjer&radius=1.0" class="stretched-link"></a>
                 </div>
             </div>
         </div>
 
-        <!-- Gastronomia -->
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card h-100 text-center p-3 category-card shadow-sm">
+            <div class="card h-100 text-center p-4 category-card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="category-icon">🍔</div> <!-- Można zamienić na ikonę -->
-                    <h5 class="card-title">Gastronomia</h5>
+                    <div class="category-icon mb-3"><i class="bi bi-egg-fried text-warning fs-2"></i></div>
+                    <h5 class="card-title fw-bold">Gastronomia</h5>
                     <p class="card-text small text-muted">Restauracje i fast-food.</p>
-                    <a href="#" class="stretched-link"></a>
+                    <a href="/Home/Search?location=Warszawa&industry=restauracja&radius=1.0" class="stretched-link"></a>
                 </div>
             </div>
         </div>
 
-        <!-- Sklep -->
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card h-100 text-center p-3 category-card shadow-sm">
+            <div class="card h-100 text-center p-4 category-card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="category-icon">🛒</div> <!-- Można zamienić na ikonę -->
-                    <h5 class="card-title">Sklep spożywczy</h5>
+                    <div class="category-icon mb-3"><i class="bi bi-cart4 text-success fs-2"></i></div>
+                    <h5 class="card-title fw-bold">Sklep spożywczy</h5>
                     <p class="card-text small text-muted">Codzienne zakupy.</p>
-                    <a href="#" class="stretched-link"></a>
+                    <a href="/Home/Search?location=Warszawa&industry=spożywczy&radius=1.0" class="stretched-link"></a>
                 </div>
             </div>
         </div>
 
-        <!-- Biuro -->
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card h-100 text-center p-3 category-card shadow-sm">
+            <div class="card h-100 text-center p-4 category-card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="category-icon">💼</div> <!-- Można zamienić na ikonę -->
-                    <h5 class="card-title">Biuro / Usługi</h5>
+                    <div class="category-icon mb-3"><i class="bi bi-laptop text-info fs-2"></i></div>
+                    <h5 class="card-title fw-bold">Biuro / Usługi</h5>
                     <p class="card-text small text-muted">Księgowość, IT, Prawo.</p>
-                    <a href="#" class="stretched-link"></a>
+                    <a href="/Home/Search?location=Warszawa&industry=mechanik&radius=1.0" class="stretched-link"></a>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- 4. Sekcja Testowa GUS (Tymczasowa) -->
-        <div class="container py-5 border-top">
-            <div class="row justify-content-center text-center">
-                <div class="col-md-8">
-                    <h3 class="fw-bold mb-3">Sprawdź potencjał demograficzny (GUS)</h3>
-                    <p class="text-muted mb-4">Wpisz nazwę miasta, aby pobrać oficjalne dane o ludności z Banku Danych
-                        Lokalnych.</p>
+<div class="bg-light py-5 mt-5 border-top">
+    <div class="container py-4">
+        <div class="row justify-content-center text-center">
+            <div class="col-md-8">
+                <h3 class="fw-bold mb-3">Sprawdź potencjał demograficzny (GUS)</h3>
+                <p class="text-muted mb-4">Wpisz nazwę miasta, aby pobrać oficjalne dane o ludności z Banku Danych
+                    Lokalnych.</p>
 
-                    <form asp-action="GusStats" method="get" class="d-flex gap-2 justify-content-center">
-                        <input type="text" name="city" class="form-control w-50" placeholder="Np. Wrocław" required>
-                        <button type="submit" class="btn btn-outline-primary">Pobierz dane GUS</button>
-                    </form>
-                </div>
+                <form asp-action="GusStats" method="get" class="d-flex gap-2 justify-content-center">
+                    <div class="input-group input-group-lg shadow-sm" style="max-width: 500px;">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-building"></i></span>
+                        <input type="text" name="city" class="form-control border-start-0" placeholder="Np. Wrocław"
+                            required>
+                        <button type="submit" class="btn btn-primary px-4">Pobierz dane GUS</button>
+                    </div>
+                </form>
             </div>
         </div>
-
-
-
-
     </div>
 </div>
 
 @section Scripts
 {
     <script src="~/js/home-index.js" asp-append-version="true"></script>
+    <script>
+        function updateRadius(val) {
+            document.getElementById('radiusValue').innerText = parseFloat(val).toFixed(1) + " km";
+        }
+    </script>
 }
