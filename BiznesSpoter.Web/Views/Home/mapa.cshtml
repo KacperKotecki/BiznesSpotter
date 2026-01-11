@@ -122,6 +122,8 @@
 
 @section Scripts {
     <script>
+
+
         // Serializujemy dane, aby JavaScript na pewno otrzymał poprawny format JSON
         const placesData = @Html.Raw(hasPlaces ? JsonSerializer.Serialize(Model) : "[]");
 
@@ -133,9 +135,73 @@
         function initMap() {
             const centerPoint = { lat: centerLat, lng: centerLng };
 
+            // Uproszczony styl: ukrywamy etykiety i ikony, upraszczamy drogi; NIE ZMIENIAMY "landscape" (teren) — dodajemy wyraźne style dla budynków
+            const simplifiedStyle = [
+                {
+                    "featureType": "poi",
+                    "elementType": "labels",
+                    "stylers": [{ "visibility": "off" }] // Ukrywa domyślne ikony, by nie zasłaniały budynków
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [{ "visibility": "off" }]
+                },
+                {
+                    "elementType": "labels.icon",
+                    "stylers": [{ "visibility": "off" }]
+                },
+
+                // --- PARKI I ZIELEŃ ---
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "visibility": "on" },
+                        { "color": "#c5e1a5" } // Przyjemna, naturalna zieleń
+                    ]
+                },
+                // --- WODA I RZEKI ---
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        { "visibility": "on" },
+                        { "color": "#b3e5fc" } // Wyraźny, jasny niebieski
+                    ]
+                },
+                // --- BUDYNKI (Istotne dla analizy biznesowej) ---
+
+                // --- DROGI (Białe dla kontrastu z budynkami) ---
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [{ "color": "#ffffff" }]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [{ "color": "#ffeb3b" }] // Opcjonalnie: żółte autostrady dla lepszej orientacji w trasach dojazdowych
+                },
+                // --- ETYKIETY TEKSTOWE ---
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [{ "color": "#616161" }]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{ "color": "#f5f5f5" }]
+                }
+            ];
+
             const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13,
                 center: centerPoint,
+                zoom: 15,
+                styles: simplifiedStyle,
+                clickableIcons: false,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: true
             });
 
             // 1. RYSOWANIE OKRĘGU WYSZUKIWANIA (Twój zasięg)
@@ -199,16 +265,16 @@
                     const address = place.formatted_address || "";
 
                     infoWindow.setContent(`
-                                <div style="padding:10px; min-width: 200px;">
-                                    <strong style="font-size:1.1em">${place.name}</strong><br>
-                                    <span class="text-muted" style="font-size:0.9em">${address}</span><br>
-                                    <div style="margin-top:5px;">
-                                        Ocena: <strong>${place.rating || "-"}</strong> 
-                                        <span style="color:#fbc02d">★</span> 
-                                        <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
-                                    </div>
-                                </div>
-                            `);
+                                                <div style="padding:10px; min-width: 200px;">
+                                                    <strong style="font-size:1.1em">${place.name}</strong><br>
+                                                    <span class="text-muted" style="font-size:0.9em">${address}</span><br>
+                                                    <div style="margin-top:5px;">
+                                                        Ocena: <strong>${place.rating || "-"}</strong> 
+                                                        <span style="color:#fbc02d">★</span> 
+                                                        <small class="text-muted">(${place.user_ratings_total || 0} opinii)</small>
+                                                    </div>
+                                                </div>
+                                            `);
                     infoWindow.open(map, marker);
                 });
             });
