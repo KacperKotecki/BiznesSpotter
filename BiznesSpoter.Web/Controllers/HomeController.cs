@@ -9,12 +9,12 @@ namespace BiznesSpoter.Web.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly GooglePlacesService _placesService; 
+    private readonly GooglePlacesService _placesService;
     private readonly GusService _gusService;
-    private readonly IConfiguration _configuration; 
+    private readonly IConfiguration _configuration;
 
-    public HomeController(ILogger<HomeController> logger, 
-                          GooglePlacesService placesService, 
+    public HomeController(ILogger<HomeController> logger,
+                          GooglePlacesService placesService,
                           GusService gusService,
                           IConfiguration configuration)
     {
@@ -36,7 +36,7 @@ public class HomeController : Controller
         // 2. Pobierz koordynaty z Google
         // coords to obiekt klasy Location, a nie Nullable<Location>
         var coords = await _placesService.GetCoordinatesAsync(location);
-        
+
         if (coords == null)
         {
             return RedirectToAction("Index");
@@ -49,12 +49,12 @@ public class HomeController : Controller
 
         // 4. Pobierz dane z GUS ("Silent Search")
         GusStatsViewModel? gusStats = null;
-        try 
+        try
         {
-             // Używamy nazwy location wpisanej przez użytkownika
-             gusStats = await _gusService.GetStatsForCityNameAsync(location);
+            // Używamy nazwy location wpisanej przez użytkownika
+            gusStats = await _gusService.GetStatsForCityNameAsync(location);
         }
-        catch 
+        catch
         {
             // Ignorujemy błędy GUS, żeby nie zablokować mapy
         }
@@ -72,6 +72,7 @@ public class HomeController : Controller
             GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"]
         };
 
+        ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
         return View("mapa", viewModel);
     }
     [HttpGet]
@@ -84,7 +85,9 @@ public class HomeController : Controller
         if (!string.IsNullOrWhiteSpace(unitId))
         {
             var statsById = await _gusService.GetCityStatsByUnitIdAsync(unitId);
-            return View(statsById);
+            var searchVm = new SearchMapViewModel { Places = new List<PlaceResult>(), GusStats = statsById, SearchLocation = city, GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] };
+            ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
+            return View("mapa", searchVm);
         }
 
         // Otherwise search for candidates
@@ -92,7 +95,9 @@ public class HomeController : Controller
         if (candidates == null || candidates.Count == 0)
         {
             var stats = await _gusService.GetCityStatsAsync(city);
-            return View(stats);
+            var searchVm = new SearchMapViewModel { Places = new List<PlaceResult>(), GusStats = stats, SearchLocation = city, GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] };
+            ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
+            return View("mapa", searchVm);
         }
 
         if (candidates.Count > 1)
@@ -103,7 +108,9 @@ public class HomeController : Controller
         // single candidate
         var single = candidates.First();
         var statsSingle = await _gusService.GetCityStatsByUnitIdAsync(single.Id ?? string.Empty);
-        return View(statsSingle);
+        var searchVmSingle = new SearchMapViewModel { Places = new List<PlaceResult>(), GusStats = statsSingle, SearchLocation = city, GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] };
+        ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
+        return View("mapa", searchVmSingle);
     }
     public IActionResult Index()
     {
