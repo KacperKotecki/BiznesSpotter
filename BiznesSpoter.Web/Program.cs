@@ -13,6 +13,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddHttpClient<GooglePlacesService>();
 builder.Services.AddHttpClient<GusService>();
+builder.Services.AddScoped<BusinessAnalysisService>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
