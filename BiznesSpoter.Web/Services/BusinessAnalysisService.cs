@@ -1,4 +1,5 @@
 using BiznesSpoter.Web.Models;
+using BiznesSpoter.Web.Models.Domain;
 
 namespace BiznesSpoter.Web.Services
 {
@@ -36,6 +37,7 @@ namespace BiznesSpoter.Web.Services
                 _logger.LogWarning("Could not geocode location: {Location}", location);
                 return null;
             }
+
             var placesTask = _placesService.SearchPlacesAsync(
                 coordinates.Lat, 
                 coordinates.Lng, 
@@ -46,28 +48,30 @@ namespace BiznesSpoter.Web.Services
 
             await Task.WhenAll(placesTask, gusTask);
 
-            var places = await placesTask; 
-
-            GusStatsViewModel? gusStats = null;
+            var places = await placesTask;
+            
+            DemographicData? demographicData = null;
             try
             {
-                gusStats = await gusTask;
+                demographicData = await gusTask;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to fetch GUS statistics for location: {Location}", location);
             }
 
-            if (gusStats != null)
+            MarketAnalysis? marketAnalysis = null;
+            if (demographicData?.Population.HasValue == true)
             {
-                gusStats.PlacesCount = places.Count;
+                marketAnalysis = CalculateMarketAnalysis(places.Count, demographicData.Population.Value);
             }
 
             return new BusinessAnalysisResult
             {
                 CenterCoordinates = coordinates,
                 CompetitorPlaces = places,
-                DemographicStats = gusStats,
+                DemographicData = demographicData,
+                MarketAnalysis = marketAnalysis,
                 SearchParameters = new SearchParameters
                 {
                     Location = location,
@@ -76,13 +80,38 @@ namespace BiznesSpoter.Web.Services
                 }
             };
         }
+
+        private MarketAnalysis CalculateMarketAnalysis(int competitorCount, double population)
+        {
+            var residentsPerBusiness = competitorCount > 0 
+                ? population / competitorCount 
+                : population;
+
+            var competitionIndex = (competitorCount / population) * 10000;
+
+            var status = competitionIndex switch
+            {
+                <= 0.5 => MarketStatus.VeryLowCompetition,
+                <= 1.0 => MarketStatus.LowCompetition,
+                <= 2.0 => MarketStatus.ModerateCompetition,
+                <= 3.0 => MarketStatus.HighCompetition,
+                _ => MarketStatus.VerySaturated
+            };
+
+            return new MarketAnalysis(
+                competitorCount, 
+                competitionIndex, 
+                residentsPerBusiness, 
+                status);
+        }
     }
 
     public class BusinessAnalysisResult
     {
         public Location CenterCoordinates { get; set; } = null!;
         public List<PlaceResult> CompetitorPlaces { get; set; } = new();
-        public GusStatsViewModel? DemographicStats { get; set; }
+        public DemographicData? DemographicData { get; set; }
+        public MarketAnalysis? MarketAnalysis { get; set; }
         public SearchParameters SearchParameters { get; set; } = null!;
     }
 

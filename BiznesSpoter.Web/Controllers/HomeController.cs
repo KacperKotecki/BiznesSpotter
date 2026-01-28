@@ -1,25 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using BiznesSpoter.Web.Models;
 using BiznesSpoter.Web.Services;
+using BiznesSpoter.Web.Models.ViewModels;
 
 namespace BiznesSpoter.Web.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly BusinessAnalysisService _analysisService; 
-    private readonly GusService _gusService;
+    private readonly BusinessAnalysisService _analysisService;
     private readonly IConfiguration _configuration;
 
     public HomeController(
         ILogger<HomeController> logger,
-        BusinessAnalysisService analysisService, 
-        GusService gusService,
+        BusinessAnalysisService analysisService,
         IConfiguration configuration)
     {
         _logger = logger;
         _analysisService = analysisService;
-        _gusService = gusService;
         _configuration = configuration;
     }
 
@@ -29,15 +28,15 @@ public class HomeController : Controller
         var analysisResult = await _analysisService.AnalyzeBusinessPotentialAsync(
             location, 
             industry, 
-            radius);
+            radius * 1000); // Konwersja km -> metry
 
         if (analysisResult == null)
         {
+            _logger.LogWarning("Analysis failed for location={Location}, industry={Industry}", location, industry);
             return RedirectToAction("Index");
         }
 
         var viewModel = MapToViewModel(analysisResult);
-
         return View("mapa", viewModel);
     }
 
@@ -45,18 +44,37 @@ public class HomeController : Controller
     {
         ViewData["GoogleMapsApiKey"] = _configuration["GoogleMaps:ApiKey"];
 
+        GusStatsViewModel? gusViewModel = null;
+        
+        if (result.DemographicData != null && result.MarketAnalysis != null)
+        {
+            gusViewModel = new GusStatsViewModel
+            {
+                CityName = result.DemographicData.CityName,
+                UnitId = result.DemographicData.UnitId,
+                Population = result.DemographicData.Population,
+                Year = result.DemographicData.DataYear,
+                
+                PlacesCount = result.MarketAnalysis.CompetitorCount,
+                CompetitionIndex = result.MarketAnalysis.CompetitionIndex,
+                ResidentsPerBusiness = result.MarketAnalysis.ResidentsPerBusiness,
+                MarketStatus = result.MarketAnalysis.Status
+            };
+        }
+
         return new SearchMapViewModel
         {
             Places = result.CompetitorPlaces,
-            GusStats = result.DemographicStats,
+            GusStats = gusViewModel,
             SearchLocation = result.SearchParameters.Location,
             SearchIndustry = result.SearchParameters.Industry,
-            SearchRadius = result.SearchParameters.RadiusMeters,
+            SearchRadius = result.SearchParameters.RadiusMeters / 1000,
             CenterLat = result.CenterCoordinates.Lat,
             CenterLng = result.CenterCoordinates.Lng,
             GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"]
         };
     }
+
     public IActionResult Index()
     {
         return View();

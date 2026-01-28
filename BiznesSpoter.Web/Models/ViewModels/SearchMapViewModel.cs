@@ -1,7 +1,7 @@
 using BiznesSpoter.Web.Models;
 
-namespace BiznesSpoter.Web.Models
-{
+namespace BiznesSpoter.Web.Models.ViewModels;
+
     public class SearchMapViewModel
     {
         // Lista miejsc z mapy
@@ -21,4 +21,3 @@ namespace BiznesSpoter.Web.Models
 
         public string? GoogleMapsApiKey { get; set; }
     }
-}
