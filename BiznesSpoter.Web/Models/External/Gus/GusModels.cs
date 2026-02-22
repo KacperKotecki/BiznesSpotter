@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BiznesSpoter.Web.Models.Gus;
+namespace BiznesSpoter.Web.Models.External.Gus;
 
 public class GusSearchResponse
 {

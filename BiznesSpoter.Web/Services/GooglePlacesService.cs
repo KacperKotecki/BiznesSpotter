@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
-using BiznesSpoter.Web.Models;
+using BiznesSpoter.Web.Models.External.GooglePlaces;
 
 namespace BiznesSpoter.Web.Services
 {

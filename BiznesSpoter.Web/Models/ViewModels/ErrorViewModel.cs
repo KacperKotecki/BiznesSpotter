@@ -1,4 +1,4 @@
-namespace BiznesSpoter.Web.Models;
+namespace BiznesSpoter.Web.Models.ViewModels;
 
 public class ErrorViewModel
 {

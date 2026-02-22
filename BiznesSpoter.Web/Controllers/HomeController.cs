@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using BiznesSpoter.Web.Models;
+using BiznesSpoter.Web.Models.External.GooglePlaces;
+using BiznesSpoter.Web.Models.External.Gus;
 using BiznesSpoter.Web.Services;
 using BiznesSpoter.Web.Models.ViewModels;
 

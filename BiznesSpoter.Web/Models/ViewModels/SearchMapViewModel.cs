@@ -1,4 +1,4 @@
-using BiznesSpoter.Web.Models;
+using BiznesSpoter.Web.Models.External.GooglePlaces;
 
 namespace BiznesSpoter.Web.Models.ViewModels;
 

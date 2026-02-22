@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BiznesSpoter.Web.Models
+namespace BiznesSpoter.Web.Models.External.GooglePlaces
 {
     public class GooglePlacesResponse
     {

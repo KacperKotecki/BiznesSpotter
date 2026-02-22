@@ -1,6 +1,6 @@
 using System.Text.Json;
 using BiznesSpoter.Web.Models.Domain;
-using BiznesSpoter.Web.Models.Gus;
+using BiznesSpoter.Web.Models.External.Gus;
 
 namespace BiznesSpoter.Web.Services
 {

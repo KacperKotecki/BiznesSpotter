@@ -1,4 +1,5 @@
-using BiznesSpoter.Web.Models;
+using BiznesSpoter.Web.Models.External.GooglePlaces;
+using BiznesSpoter.Web.Models.External.Gus;
 using BiznesSpoter.Web.Models.Domain;
 
 namespace BiznesSpoter.Web.Services
