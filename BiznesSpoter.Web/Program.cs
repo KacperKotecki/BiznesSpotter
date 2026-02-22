@@ -4,7 +4,11 @@ using BiznesSpoter.Web.Data;
 using BiznesSpoter.Web.Services;
 using BiznesSpoter.Web.Data.Repositories;
 
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

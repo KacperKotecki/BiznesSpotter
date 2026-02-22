@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: biznes_spotter_web
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - biznes_spotter_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  biznes_spotter_data:
+    name: biznes_spotter_data
