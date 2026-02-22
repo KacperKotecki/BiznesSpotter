@@ -19,7 +19,7 @@ namespace BiznesSpoter.Web.Services
         public async Task<List<PlaceResult>> SearchPlacesAsync(double lat, double lng, string industry, double radiusKm)
         {
 
-            int radiusMeters = (int)(radiusKm * 1000); 
+            int radiusMeters = (int)(radiusKm); 
 
             var latStr = lat.ToString(CultureInfo.InvariantCulture);
             var lngStr = lng.ToString(CultureInfo.InvariantCulture);
