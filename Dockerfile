@@ -2,8 +2,11 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 8082
+EXPOSE 8083
+
+# Zmiana domyślnego portu ASP.NET Core na 8082
+ENV ASPNETCORE_HTTP_PORTS=8082
 
 # Etap 2: Build - obraz SDK do kompilacji
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
