@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BiznesSpoter.Web.Data;
 using BiznesSpoter.Web.Services;
+using BiznesSpoter.Web.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddHttpClient<IGooglePlacesService, GooglePlacesService>();
-builder.Services.AddHttpClient<IGusService, GusService>();
-builder.Services.AddScoped<IBusinessAnalysisService, BusinessAnalysisService>();
+builder.Services.AddHttpClient<IGusService, GusService>(); // <--- TEGO BRAKOWAŁO
+
+builder.Services.AddScoped<ISearchHistoryRepository, SearchHistoryRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IBusinessAnalysisService, BusinessAnalysisService>(); // <--- TEGO BRAKOWAŁO
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();

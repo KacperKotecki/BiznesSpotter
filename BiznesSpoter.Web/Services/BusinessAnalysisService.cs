@@ -1,30 +1,36 @@
 using BiznesSpoter.Web.Models.External.GooglePlaces;
 using BiznesSpoter.Web.Models.External.Gus;
 using BiznesSpoter.Web.Models.Domain;
+using BiznesSpoter.Web.Data.Repositories;
+using BiznesSpoter.Web.Data.Entities;
 
 namespace BiznesSpoter.Web.Services
 {
     public class BusinessAnalysisService : IBusinessAnalysisService
     {
-
         private readonly IGooglePlacesService _placesService;
         private readonly IGusService _gusService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusinessAnalysisService> _logger;
 
         public BusinessAnalysisService(
             IGooglePlacesService placesService,
             IGusService gusService,
+            IUnitOfWork unitOfWork,
             ILogger<BusinessAnalysisService> logger)
         {
             _placesService = placesService;
             _gusService = gusService;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
+
 
         public async Task<BusinessAnalysisResult?> AnalyzeBusinessPotentialAsync(
             string location, 
             string industry, 
-            double radiusMeters)
+            double radiusMeters,
+            string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(industry))
             {
@@ -68,6 +74,24 @@ namespace BiznesSpoter.Web.Services
                 marketAnalysis = CalculateMarketAnalysis(places.Count, demographicData.Population.Value);
             }
 
+            if (!string.IsNullOrEmpty(userId) && marketAnalysis != null && demographicData != null)
+            {
+                var history = new SearchHistory
+                {
+                    UserId = userId,
+                    Location = location,
+                    Industry = industry,
+                    RadiusMeters = radiusMeters,
+                    SearchDate = DateTime.UtcNow,
+                    CompetitorCount = marketAnalysis.CompetitorCount,
+                    Population = demographicData.Population,
+                    CompetitionIndex = marketAnalysis.CompetitionIndex
+                };
+
+                await _unitOfWork.SearchHistories.AddAsync(history);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             return new BusinessAnalysisResult
             {
                 CenterCoordinates = coordinates,
@@ -82,6 +106,7 @@ namespace BiznesSpoter.Web.Services
                 }
             };
         }
+
 
         private MarketAnalysis CalculateMarketAnalysis(int competitorCount, double population)
         {
