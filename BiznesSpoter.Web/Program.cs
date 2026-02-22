@@ -11,9 +11,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddHttpClient<GooglePlacesService>();
-builder.Services.AddHttpClient<GusService>();
-builder.Services.AddScoped<BusinessAnalysisService>();
+builder.Services.AddHttpClient<IGooglePlacesService, GooglePlacesService>();
+builder.Services.AddHttpClient<IGusService, GusService>();
+builder.Services.AddScoped<IBusinessAnalysisService, BusinessAnalysisService>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();

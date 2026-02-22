@@ -4,15 +4,16 @@ using BiznesSpoter.Web.Models.Domain;
 
 namespace BiznesSpoter.Web.Services
 {
-    public class BusinessAnalysisService
+    public class BusinessAnalysisService : IBusinessAnalysisService
     {
-        private readonly GooglePlacesService _placesService;
-        private readonly GusService _gusService;
+
+        private readonly IGooglePlacesService _placesService;
+        private readonly IGusService _gusService;
         private readonly ILogger<BusinessAnalysisService> _logger;
 
         public BusinessAnalysisService(
-            GooglePlacesService placesService,
-            GusService gusService,
+            IGooglePlacesService placesService,
+            IGusService gusService,
             ILogger<BusinessAnalysisService> logger)
         {
             _placesService = placesService;

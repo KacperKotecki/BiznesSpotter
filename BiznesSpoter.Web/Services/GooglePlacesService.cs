@@ -4,7 +4,7 @@ using BiznesSpoter.Web.Models.External.GooglePlaces;
 
 namespace BiznesSpoter.Web.Services
 {
-    public class GooglePlacesService
+    public class GooglePlacesService : IGooglePlacesService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;

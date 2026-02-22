@@ -4,7 +4,7 @@ using BiznesSpoter.Web.Models.External.Gus;
 
 namespace BiznesSpoter.Web.Services
 {
-    public class GusService
+    public class GusService : IGusService
     {
         private readonly HttpClient _httpClient;
         private const string BaseUrl = "https://bdl.stat.gov.pl/api/v1";

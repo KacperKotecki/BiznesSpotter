@@ -3,6 +3,17 @@
 }
 <link rel="stylesheet" href="~/css/home-index.css" asp-append-version="true" />
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
 <div class="hero-section shadow-sm animate__animated animate__fadeIn">
     <div class="container text-center">
         <h1 class="display-4 fw-bold">Znajdź idealne miejsce na swój biznes</h1>
