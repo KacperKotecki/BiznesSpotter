@@ -54,6 +54,14 @@ namespace BiznesSpoter.Web.Services
 
             var gusTask = _gusService.GetStatsForCityNameAsync(location);
 
+            try
+            {
+                await Task.WhenAll(placesTask, gusTask);
+            }
+            catch (Exception)
+            {
+                _logger.LogError("Error occurred while fetching data for location: {Location}", location);
+            }    
             await Task.WhenAll(placesTask, gusTask);
 
             var places = await placesTask;
